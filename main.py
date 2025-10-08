@@ -5,6 +5,7 @@ from random import randint
 from pickle import load as pload
 from uuid import uuid4
 from settings import *
+from time import time as currenttime
 if not os.path.isdir("temp"):
     os.mkdir("temp")
 pygame.init()
@@ -31,7 +32,7 @@ def cont2img(index:str,dic:dict):
     filename = savdat(index,dic[index])
     return pygame.image.load(filename).convert_alpha()
 def init():
-    global imgls,angls,sidls,bgm,star,galaxypos,galaxyangls
+    global imgls,angls,sidls,bgm,star,galaxypos,galaxyangls,galaxycenter,starrotated
     with open("main.pdb","rb") as file:
         dic = pload(file)
     star4 = cont2img("4.png",dic)
@@ -39,41 +40,51 @@ def init():
     star6 = cont2img("6.png",dic)
     starlock = cont2img("lock.png",dic)
     star = [star4,star5,star6,starlock]
+    starrotated = [[],[],[],[starlock]]
+    for angle in range(360):
+        starrotated[0].append(pygame.transform.rotate(star4,angle))
+        starrotated[1].append(pygame.transform.rotate(star5,angle))
+        starrotated[2].append(pygame.transform.rotate(star6,angle))
     galaxypos = [[cont2img("星系2.png",dic)] + GAL_SPEED["星系2"]]
     galaxyangls = [randint(0,359)]
     bgm = pygame.mixer.Sound(savdat("ogg",dic["bg.ogg"]))
+    galaxycenter = {}
     imgls = {}
     angls = {}
     sidls = {}
-    screensize = screen.get_size()
     for galaxyname in dic["星座/galaxy.json"]:
         imgls[galaxyname] = []
         angls[galaxyname] = []
+        galaxycenter[galaxyname] = [0,0]
         scaled = [[int(stardat["pos"][0]/INITIAL_SCRSIZE[0]*screensize[0]),int(stardat["pos"][1]/INITIAL_SCRSIZE[1]*screensize[1]),stardat["star"]] for stardat in dic["星座/galaxy.json"][galaxyname]]
         starcnt = 0
         for stardat in scaled:
             if stardat[2]:
                 starcnt += 1
+                galaxycenter[galaxyname][0] += stardat[0]
+                galaxycenter[galaxyname][1] += stardat[1]
                 if f"星座/{galaxyname}/{starcnt}.jpg" in dic:
                     select = cont2img(f"星座/{galaxyname}/{starcnt}.jpg",dic).convert()
-                    if screen.get_size()[0] / select.get_size()[0] > screen.get_size()[1] / select.get_size()[1]:
-                        key = screen.get_size()[1] / select.get_size()[1]
+                    if screensize[0] / select.get_size()[0] > screensize[1] / select.get_size()[1]:
+                        key = screensize[1] / select.get_size()[1]
                     else:
-                        key = screen.get_size()[0] / select.get_size()[0]
+                        key = screensize[0] / select.get_size()[0]
                     image = pygame.transform.smoothscale(select,[select.get_size()[0]*key,select.get_size()[1]*key])
                     imgls[galaxyname].append({"image":image,"pos":stardat[:2],"type":randint(0,2),"rotate":randint(0,1)*2-1})
                     angls[galaxyname].append(randint(0,359))
                 else:
                     imgls[galaxyname].append({"image":None,"pos":stardat[:2],"type":3,"rotate":0})
                     angls[galaxyname].append(0)
+        galaxycenter[galaxyname][0] /= starcnt
+        galaxycenter[galaxyname][1] /= starcnt
         sidls[galaxyname] = [stardat[:2] for stardat in scaled]
 def draw():
     global speed,mouse,select,galaxypos,in_screen,galaxyangls,screen,imgls,sidls,clock
+    starttime = currenttime()
     speed += leftbuttondown
     speed -= rightbuttondown
     speed = round(speed * SPEED_DACAY,5)
     mouse = pygame.mouse.get_pos()
-    s = screen.convert_alpha()
     for i in range(len(galaxypos)):
         galaxypos[i][1] += speed * BG_GALAXY_SPEED
         in_screen = False
@@ -82,56 +93,64 @@ def draw():
         img.set_alpha(255 - alpha)
         rect = img.get_rect()
         rect.center = galaxypos[i][1:3]
-        if rect.centerx + img.get_width() / 2 > 0 and rect.centerx - img.get_width() / 2 < screen.get_size()[0]:
+        if rect.centerx + img.get_width() / 2 > 0 and rect.centerx - img.get_width() / 2 < screensize[0]:
             in_screen = True
         if in_screen:
-            s.blit(img,rect)
+            screen.blit(img,rect)
         else:
-            if galaxypos[i][1] > screen.get_size()[0]:
-                galaxypos[i][1] -= screen.get_size()[0] * 2
+            if galaxypos[i][1] > screensize[0]:
+                galaxypos[i][1] -= screensize[0] * 2
             elif galaxypos[i][1] < 0:
-                galaxypos[i][1] += screen.get_size()[0] * 2
+                galaxypos[i][1] += screensize[0] * 2
     select,ind = get_selected(i,mouse)
-    for i in imgls:
-        for j in sidls[i]:
+    for galaxyname in imgls:
+        for j in sidls[galaxyname]:
             j[0] += speed
-        pygame.draw.aalines(s,LINE_COLOR + [255 - alpha],False,sidls[i])
+        linecolor = [i * (360 - alpha) / 360 for i in LINE_COLOR]
+        pygame.draw.aalines(screen,linecolor,False,sidls[galaxyname])
         in_screen = False
-        for j in range(len(imgls[i])):
-            img = pygame.transform.rotate(star[imgls[i][j]["type"]],angls[i][j])
-            if i == ind[0] and j == ind[1]:
+        for j in range(len(imgls[galaxyname])):
+            img = starrotated[imgls[galaxyname][j]["type"]][angls[galaxyname][j]]
+            if galaxyname == ind[0] and j == ind[1]:
                 img = pygame.transform.scale2x(img)
-            angls[i][j] = (angls[i][j] + imgls[i][j]["rotate"]) % 360
+            angls[galaxyname][j] = (angls[galaxyname][j] + imgls[galaxyname][j]["rotate"]) % 360
             rect = img.get_rect()
-            imgls[i][j]["pos"][0] += speed
-            if imgls[i][j]["pos"][0] > 0 and imgls[i][j]["pos"][0] < screen.get_size()[0]:
+            imgls[galaxyname][j]["pos"][0] += speed
+            if imgls[galaxyname][j]["pos"][0] > 0 and imgls[galaxyname][j]["pos"][0] < screensize[0]:
                 in_screen = True
-            rect.center = imgls[i][j]["pos"]
+            rect.center = imgls[galaxyname][j]["pos"]
             img.set_alpha(255 - alpha)
-            s.blit(img,rect)
+            screen.blit(img,rect)
         if not in_screen:
-            for j in imgls[i]:
-                if j["pos"][0] > screen.get_size()[0]:
-                    j["pos"][0] -= screen.get_size()[0] * 2
+            for j in imgls[galaxyname]:
+                if j["pos"][0] > screensize[0]:
+                    j["pos"][0] -= screensize[0] * 2
                 elif j["pos"][0] < 0:
-                    j["pos"][0] += screen.get_size()[0] * 2
-            for j in sidls[i]:
-                if j[0] > screen.get_size()[0]:
-                    j[0] -= screen.get_size()[0] * 2
+                    j["pos"][0] += screensize[0] * 2
+            for j in sidls[galaxyname]:
+                if j[0] > screensize[0]:
+                    j[0] -= screensize[0] * 2
                 elif j[0] < 0:
-                    j[0] += screen.get_size()[0] * 2
+                    j[0] += screensize[0] * 2
     if showing:
         image.set_alpha(alpha)
-        s.blit(image,loc)
-    screen.blit(s,[0,0])
+        screen.blit(image,loc)
     pygame.display.update()
+    if PERFORMANCE_TRACK:
+        endtime = currenttime()
+        if endtime - starttime >= 1.5 / TICK_SPEED:
+            print("Performance warning: expected %.3fms, %3fms"%(1/TICK_SPEED,endtime - starttime))
+        elif endtime - starttime <= 0.4 / TICK_SPEED:
+            print("Performance warning: expected %.3fms, %3fms"%(1/TICK_SPEED,endtime - starttime))
     clock.tick(TICK_SPEED)
 
 
 
 
-screen = pygame.display.set_mode([0,0],pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.FULLSCREEN,8)
+# screen = pygame.display.set_mode([0,0],pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.FULLSCREEN,8)
+screen = pygame.display.set_mode([1024,768])
 pygame.event.set_allowed([pygame.KEYDOWN,pygame.KEYUP,pygame.MOUSEBUTTONDOWN])
+screensize = screen.get_size()
 keepgoing = True
 first = True
 alpha = 0
@@ -142,8 +161,8 @@ logo2 = cont2img("logo2.png",temp)
 logo = cont2img("logo.png",temp)
 clock = pygame.time.Clock()
 initd = Thread(target=init)
-logo2loc = [(screen.get_size()[0]-logo2.get_size()[0])/2,(screen.get_size()[1]+logo.get_size()[1])/2]
-logoloc = [(screen.get_size()[0]-logo.get_size()[0])/2,(screen.get_size()[1]-logo.get_size()[1])/2]
+logo2loc = [(screensize[0]-logo2.get_size()[0])/2,(screensize[1]+logo.get_size()[1])/2]
+logoloc = [(screensize[0]-logo.get_size()[0])/2,(screensize[1]-logo.get_size()[1])/2]
 while True:
     screen.fill(BG_COLOR)
     for event in pygame.event.get():
@@ -211,8 +230,8 @@ while keepgoing:
             if select:
                 showing = True
                 loc = [0,0]
-                loc[0] = abs(screen.get_size()[0] - select.get_size()[0]) / 2
-                loc[1] = abs(screen.get_size()[1] - select.get_size()[1]) / 2
+                loc[0] = abs(screensize[0] - select.get_size()[0]) / 2
+                loc[1] = abs(screensize[1] - select.get_size()[1]) / 2
                 image = pygame.transform.smoothscale(select,select.get_size())
             if showing:
                 innerkeepgoing = True

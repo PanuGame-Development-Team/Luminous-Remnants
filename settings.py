@@ -6,4 +6,5 @@ TICK_SPEED = 60
 ALPHA_DACAY = 3
 GAL_SPEED = {"星系2":[746,350,-0.1]}
 INITIAL_SCRSIZE = [1536,864]
+PERFORMANCE_TRACK = False
 from properties import *
