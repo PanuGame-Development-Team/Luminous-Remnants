@@ -1,9 +1,10 @@
 import pygame
 import os,sys
 from threading import Thread
-from random import choice,randint
+from random import randint
 from pickle import load as pload
 from uuid import uuid4
+from settings import *
 if not os.path.isdir("temp"):
     os.mkdir("temp")
 pygame.init()
@@ -14,9 +15,9 @@ def get_selected(i,mouse):
     nearest_id = [None,None]
     for i in imgls:
         for j in range(len(imgls[i])):
-            if imgls[i][j][3] != 3 and calc_distance(*imgls[i][j][1:3],*mouse) < nearest_distance:
-                nearest = imgls[i][j][0]
-                nearest_distance = calc_distance(*imgls[i][j][1:3],*mouse)
+            if imgls[i][j]["type"] != 3 and calc_distance(*imgls[i][j]["pos"],*mouse) < nearest_distance:
+                nearest = imgls[i][j]["image"]
+                nearest_distance = calc_distance(*imgls[i][j]["pos"],*mouse)
                 nearest_id = [i,j]
     if nearest_distance > 100:
         return None,[None,None]
@@ -30,95 +31,90 @@ def cont2img(index:str,dic:dict):
     filename = savdat(index,dic[index])
     return pygame.image.load(filename).convert_alpha()
 def init():
-    global imgls,angls,sidls,bgm,star,gal_pla,gpang
+    global imgls,angls,sidls,bgm,star,galaxypos,galaxyangls
     with open("main.pdb","rb") as file:
-        tmp = pload(file)
-    star4 = cont2img("4.png",tmp)
-    star5 = cont2img("5.png",tmp)
-    star6 = cont2img("6.png",tmp)
-    starlock = cont2img("lock.png",tmp)
+        dic = pload(file)
+    star4 = cont2img("4.png",dic)
+    star5 = cont2img("5.png",dic)
+    star6 = cont2img("6.png",dic)
+    starlock = cont2img("lock.png",dic)
     star = [star4,star5,star6,starlock]
-    gal_pla = [[cont2img("星系2.png",tmp),746,350,-0.1]]
-    gpang = [randint(0,359)]
-    bgm = pygame.mixer.Sound(savdat("ogg",tmp["bg.ogg"]))
+    galaxypos = [[cont2img("星系2.png",dic)] + GAL_SPEED["星系2"]]
+    galaxyangls = [randint(0,359)]
+    bgm = pygame.mixer.Sound(savdat("ogg",dic["bg.ogg"]))
     imgls = {}
     angls = {}
     sidls = {}
-    cont = tmp["星座/星座.txt"]
-    lines = cont.strip("\n").split("\n")
     screensize = screen.get_size()
-    for i in lines:
-        name = i.strip(" ").split(" ")[0]
-        imgls[name] = []
-        angls[name] = []
-        temp = [j.split(",") for j in i.strip(" ").split(" ")[1:]]
-        temp = [[int(int(j[0])/1536*screensize[0]),int(int(j[1])/864*screensize[1]),int(j[2])] for j in temp]
-        k = 0
-        for j in temp:
-            if j[2] == 1:
-                k += 1
-                if f"星座/{name}/{k}.jpg" in tmp:
-                    select = cont2img(f"星座/{name}/{k}.jpg",tmp).convert()
+    for galaxyname in dic["星座/galaxy.json"]:
+        imgls[galaxyname] = []
+        angls[galaxyname] = []
+        scaled = [[int(stardat["pos"][0]/INITIAL_SCRSIZE[0]*screensize[0]),int(stardat["pos"][1]/INITIAL_SCRSIZE[1]*screensize[1]),stardat["star"]] for stardat in dic["星座/galaxy.json"][galaxyname]]
+        starcnt = 0
+        for stardat in scaled:
+            if stardat[2]:
+                starcnt += 1
+                if f"星座/{galaxyname}/{starcnt}.jpg" in dic:
+                    select = cont2img(f"星座/{galaxyname}/{starcnt}.jpg",dic).convert()
                     if screen.get_size()[0] / select.get_size()[0] > screen.get_size()[1] / select.get_size()[1]:
                         key = screen.get_size()[1] / select.get_size()[1]
                     else:
                         key = screen.get_size()[0] / select.get_size()[0]
                     image = pygame.transform.smoothscale(select,[select.get_size()[0]*key,select.get_size()[1]*key])
-                    imgls[name].append([image,j[0],j[1],randint(0,2),randint(0,1)*2-1])
-                    angls[name].append(randint(0,359))
+                    imgls[galaxyname].append({"image":image,"pos":stardat[:2],"type":randint(0,2),"rotate":randint(0,1)*2-1})
+                    angls[galaxyname].append(randint(0,359))
                 else:
-                    imgls[name].append([None,j[0],j[1],3,0])
-                    angls[name].append(0)
-        sidls[name] = [j[:-1] for j in temp]
+                    imgls[galaxyname].append({"image":None,"pos":stardat[:2],"type":3,"rotate":0})
+                    angls[galaxyname].append(0)
+        sidls[galaxyname] = [stardat[:2] for stardat in scaled]
 def draw():
-    global speed,mouse,select,gal_pla,in_screen,gpang,screen,imgls,sidls,clock
-    speed += kdl
-    speed -= kdr
-    speed = round(speed*0.95,5)
+    global speed,mouse,select,galaxypos,in_screen,galaxyangls,screen,imgls,sidls,clock
+    speed += leftbuttondown
+    speed -= rightbuttondown
+    speed = round(speed * SPEED_DACAY,5)
     mouse = pygame.mouse.get_pos()
     s = screen.convert_alpha()
-    for i in range(len(gal_pla)):
-        gal_pla[i][1] += speed / 10
+    for i in range(len(galaxypos)):
+        galaxypos[i][1] += speed * BG_GALAXY_SPEED
         in_screen = False
-        img = pygame.transform.rotate(gal_pla[i][0],gpang[i])
-        gpang[i] = (gpang[i] + gal_pla[i][3]) % 360
+        img = pygame.transform.rotate(galaxypos[i][0],galaxyangls[i])
+        galaxyangls[i] = (galaxyangls[i] + galaxypos[i][3]) % 360
         img.set_alpha(255 - alpha)
         rect = img.get_rect()
-        rect.center = gal_pla[i][1:3]
+        rect.center = galaxypos[i][1:3]
         if rect.centerx + img.get_width() / 2 > 0 and rect.centerx - img.get_width() / 2 < screen.get_size()[0]:
             in_screen = True
         if in_screen:
             s.blit(img,rect)
         else:
-            if gal_pla[i][1] > screen.get_size()[0]:
-                gal_pla[i][1] -= screen.get_size()[0] * 2
-            elif gal_pla[i][1] < 0:
-                gal_pla[i][1] += screen.get_size()[0] * 2
-                
+            if galaxypos[i][1] > screen.get_size()[0]:
+                galaxypos[i][1] -= screen.get_size()[0] * 2
+            elif galaxypos[i][1] < 0:
+                galaxypos[i][1] += screen.get_size()[0] * 2
     select,ind = get_selected(i,mouse)
     for i in imgls:
         for j in sidls[i]:
             j[0] += speed
-        pygame.draw.aalines(s,[255,255,255,255 - alpha],False,sidls[i])
+        pygame.draw.aalines(s,LINE_COLOR + [255 - alpha],False,sidls[i])
         in_screen = False
         for j in range(len(imgls[i])):
-            img = pygame.transform.rotate(star[imgls[i][j][3]],angls[i][j])
+            img = pygame.transform.rotate(star[imgls[i][j]["type"]],angls[i][j])
             if i == ind[0] and j == ind[1]:
                 img = pygame.transform.scale2x(img)
-            angls[i][j] = (angls[i][j] + imgls[i][j][4]) % 360
+            angls[i][j] = (angls[i][j] + imgls[i][j]["rotate"]) % 360
             rect = img.get_rect()
-            imgls[i][j][1] += speed
-            if imgls[i][j][1] > 0 and imgls[i][j][1] < screen.get_size()[0]:
+            imgls[i][j]["pos"][0] += speed
+            if imgls[i][j]["pos"][0] > 0 and imgls[i][j]["pos"][0] < screen.get_size()[0]:
                 in_screen = True
-            rect.center = imgls[i][j][1:3]
+            rect.center = imgls[i][j]["pos"]
             img.set_alpha(255 - alpha)
             s.blit(img,rect)
         if not in_screen:
             for j in imgls[i]:
-                if j[1] > screen.get_size()[0]:
-                    j[1] -= screen.get_size()[0] * 2
-                elif j[1] < 0:
-                    j[1] += screen.get_size()[0] * 2
+                if j["pos"][0] > screen.get_size()[0]:
+                    j["pos"][0] -= screen.get_size()[0] * 2
+                elif j["pos"][0] < 0:
+                    j["pos"][0] += screen.get_size()[0] * 2
             for j in sidls[i]:
                 if j[0] > screen.get_size()[0]:
                     j[0] -= screen.get_size()[0] * 2
@@ -129,7 +125,7 @@ def draw():
         s.blit(image,loc)
     screen.blit(s,[0,0])
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(TICK_SPEED)
 
 
 
@@ -139,7 +135,7 @@ pygame.event.set_allowed([pygame.KEYDOWN,pygame.KEYUP,pygame.MOUSEBUTTONDOWN])
 keepgoing = True
 first = True
 alpha = 0
-asp = 3
+deltaalpha = ALPHA_DACAY
 with open("logo.pdb","rb") as file:
     temp = pload(file)
 logo2 = cont2img("logo2.png",temp)
@@ -149,68 +145,68 @@ initd = Thread(target=init)
 logo2loc = [(screen.get_size()[0]-logo2.get_size()[0])/2,(screen.get_size()[1]+logo.get_size()[1])/2]
 logoloc = [(screen.get_size()[0]-logo.get_size()[0])/2,(screen.get_size()[1]-logo.get_size()[1])/2]
 while True:
-    screen.fill([0,0,30])
+    screen.fill(BG_COLOR)
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 sys.exit()
-    if alpha >= 253:
+    if alpha >= 255 - ALPHA_DACAY + 1:
         if first:
-            asp = 0
+            deltaalpha = 0
             initd.start()
             first = False
         if not initd.is_alive():
-            asp = -3
-            while alpha > 2:
-                screen.fill([0,0,30])
+            deltaalpha = -ALPHA_DACAY
+            while alpha > ALPHA_DACAY - 1:
+                screen.fill(BG_COLOR)
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             pygame.quit()
                             sys.exit()
-                alpha += asp
+                alpha += deltaalpha
                 logo.set_alpha(alpha)
                 logo2.set_alpha(alpha)
                 screen.blit(logo,logoloc)
                 screen.blit(logo2,logo2loc)
                 pygame.display.update()
-                clock.tick(60)
+                clock.tick(TICK_SPEED)
             break
-    alpha += asp
+    alpha += deltaalpha
     logo.set_alpha(alpha)
     logo2.set_alpha(alpha)
     screen.blit(logo,logoloc)
     screen.blit(logo2,logo2loc)
     pygame.display.update()
-    clock.tick(60)
-del init,first,alpha,asp,logo,initd,logoloc
+    clock.tick(TICK_SPEED)
+del init,first,alpha,deltaalpha,logo,initd,logoloc
 
 
 
 
 speed = 0
-kdl = kdr = False
+leftbuttondown = rightbuttondown = False
 showing = False
 select = False
 showing = False
 alpha = 0
 bgm.play(-1)
 while keepgoing:
-    screen.fill([0,0,30])
+    screen.fill(BG_COLOR)
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 keepgoing = False
             elif event.key == pygame.K_LEFT:
-                kdl = True
+                leftbuttondown = True
             elif event.key == pygame.K_RIGHT:
-                kdr = True
+                rightbuttondown = True
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
-                kdl = False
+                leftbuttondown = False
             elif event.key == pygame.K_RIGHT:
-                kdr = False
+                rightbuttondown = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             if select:
                 showing = True
@@ -219,35 +215,35 @@ while keepgoing:
                 loc[1] = abs(screen.get_size()[1] - select.get_size()[1]) / 2
                 image = pygame.transform.smoothscale(select,select.get_size())
             if showing:
-                kg = True
-                kdl = kdr = False
+                innerkeepgoing = True
+                leftbuttondown = rightbuttondown = False
                 alpha = 0
-                while kg:
-                    screen.fill([0,0,30])
+                while innerkeepgoing:
+                    screen.fill(BG_COLOR)
                     for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
-                                kg = False
+                                innerkeepgoing = False
                                 keepgoing = False
-                                alpha = -3
+                                alpha = -ALPHA_DACAY
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            kg = False
-                    if alpha < 253:
-                        alpha += 3
+                            innerkeepgoing = False
+                    if alpha < 255 - ALPHA_DACAY + 1:
+                        alpha += ALPHA_DACAY
                     else:
                         alpha = 255
                     draw()
                 while alpha > 0:
-                    screen.fill([0,0,30])
+                    screen.fill(BG_COLOR)
                     for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
                                 keepgoing = False
-                                alpha = 3
+                                alpha = ALPHA_DACAY
                     draw()
-                    alpha -= 3
+                    alpha -= ALPHA_DACAY
                 alpha = 0
                 showing = False
-                screen.fill([0,0,30])
+                screen.fill(BG_COLOR)
     draw()
 pygame.quit()

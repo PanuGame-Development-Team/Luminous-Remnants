@@ -1,3 +1,6 @@
 /星座/*/*.jpg
 *.pdb
 temp
+label.txt
+/properties.py
+__pycache__/

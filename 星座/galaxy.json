@@ -1,0 +1,123 @@
+{
+    "天琴座":[
+        {"pos":[470,769],"star":true},
+        {"pos":[352,633],"star":true},
+        {"pos":[195,541],"star":true},
+        {"pos":[168,132],"star":true},
+        {"pos":[322,222],"star":true},
+        {"pos":[352,633],"star":false}
+    ],
+    "猎户座":[
+        {"pos":[749,458],"star":true},
+        {"pos":[790,467],"star":true},
+        {"pos":[837,469],"star":true},
+        {"pos":[769,787],"star":true},
+        {"pos":[550,623],"star":true},
+        {"pos":[749,458],"star":false},
+        {"pos":[864,119],"star":true},
+        {"pos":[1029,177],"star":true},
+        {"pos":[1008,336],"star":true},
+        {"pos":[864,119],"star":false},
+        {"pos":[1008,336],"star":false},
+        {"pos":[1207,530],"star":true},
+        {"pos":[1181,552],"star":true},
+        {"pos":[1098,620],"star":true}
+    ],
+    "仙后座": [
+        { "pos": [485, 97], "star": true },
+        { "pos": [659, 155], "star": true },
+        { "pos": [562, 274], "star": true },
+        { "pos": [636, 368], "star": true },
+        { "pos": [554, 498], "star": true }
+    ],
+    "仙王座": [
+        { "pos": [1351, 447], "star": true },
+        { "pos": [1405, 434], "star": true },
+        { "pos": [1490, 286], "star": true },
+        { "pos": [1367, 157], "star": true },
+        { "pos": [1124, 83], "star": true },
+        { "pos": [1247, 303], "star": true },
+        { "pos": [1405, 434], "star": false }
+    ],
+    "大犬座": [
+        { "pos": [1557, 182], "star": true },
+        { "pos": [1699, 264], "star": true },
+        { "pos": [1647, 410], "star": true },
+        { "pos": [1699, 264], "star": false },
+        { "pos": [1832, 499], "star": true },
+        { "pos": [1869, 665], "star": true },
+        { "pos": [1821, 703], "star": true },
+        { "pos": [1436, 665], "star": true },
+        { "pos": [1821, 703], "star": false },
+        { "pos": [1704, 819], "star": true },
+        { "pos": [1821, 703], "star": false },
+        { "pos": [1869, 665], "star": false },
+        { "pos": [1952, 624], "star": true },
+        { "pos": [2013, 654], "star": true },
+        { "pos": [2071, 779], "star": true },
+        { "pos": [2013, 654], "star": false },
+        { "pos": [1952, 624], "star": false },
+        { "pos": [1927, 507], "star": true },
+        { "pos": [1867, 342], "star": true },
+        { "pos": [1814, 181], "star": true },
+        { "pos": [1928, 221], "star": true },
+        { "pos": [2024, 186], "star": true },
+        { "pos": [1960, 37], "star": true },
+        { "pos": [1928, 221], "star": false },
+        { "pos": [1814, 181], "star": false },
+        { "pos": [1699, 264], "star": false }
+    ],
+    "南十字座": [
+        { "pos": [890, 715], "star": true },
+        { "pos": [1273, 713], "star": true },
+        { "pos": [1027, 714], "star": false },
+        { "pos": [1046, 590], "star": true },
+        { "pos": [1009, 820], "star": true }
+    ],
+    "天鹰座": [
+        { "pos": [2103, 49], "star": true },
+        { "pos": [2118, 105], "star": true },
+        { "pos": [2381, 408], "star": true },
+        { "pos": [2713, 421], "star": true },
+        { "pos": [2381, 408], "star": false },
+        { "pos": [2338, 612], "star": true },
+        { "pos": [2319, 763], "star": true },
+        { "pos": [2338, 612], "star": false },
+        { "pos": [2381, 408], "star": false },
+        { "pos": [2097, 469], "star": true },
+        { "pos": [2060, 412], "star": true },
+        { "pos": [2097, 469], "star": false },
+        { "pos": [2156, 538], "star": true }
+    ],
+    "苍蝇座": [
+        { "pos": [3025, 219], "star": true },
+        { "pos": [2906, 491], "star": true },
+        { "pos": [2779, 641], "star": true },
+        { "pos": [2518, 562], "star": true },
+        { "pos": [2779, 641], "star": false },
+        { "pos": [2525, 779], "star": true },
+        { "pos": [2779, 641], "star": false },
+        { "pos": [2857, 735], "star": true }
+    ],
+    "北斗七星": [
+        { "pos": [3121, 146], "star": true },
+        { "pos": [2939, 93], "star": true },
+        { "pos": [2827, 134], "star": true },
+        { "pos": [2681, 175], "star": true },
+        { "pos": [2402, 118], "star": true },
+        { "pos": [2414, 270], "star": true },
+        { "pos": [2632, 295], "star": true },
+        { "pos": [2681, 175], "star": false }
+    ],
+    "三角座": [
+        { "pos": [3135, 318], "star": true },
+        { "pos": [2986, 771], "star": true },
+        { "pos": [3119, 745], "star": true },
+        { "pos": [3135, 318], "star": false }
+    ],
+    "小狮座": [
+        { "pos": [1379, 599], "star": true },
+        { "pos": [1555, 538], "star": true },
+        { "pos": [1696, 574], "star": true }
+    ]
+}

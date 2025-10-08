@@ -1,4 +1,4 @@
-import pickle
+import pickle,json
 import pygame
 pygame.init()
 # def imga2ls(img):
@@ -22,20 +22,22 @@ with open("main.pdb","wb") as file:
     dic["lock.png"] = open("lock.png","rb").read()
     print("正在打包:  " + "bg.ogg")
     dic["bg.ogg"] = open("bg.ogg","rb").read()
-    with open("星座/星座.txt",encoding="UTF-8") as f:
-        print("正在打包:  " + "星座/星座.txt")
-        dic["星座/星座.txt"] = f.read()
-    lines = dic["星座/星座.txt"].strip("\n").split("\n")
-    for i in lines:
-        name = i.strip(" ").split(" ")[0]
-        posls = [[int(k[0]),int(k[1]),int(k[2])] for k in [j.split(",") for j in i.strip(" ").split(" ")[1:]]]
-        k = 0
-        for j in posls:
-            if j[2] == 1:
-                k += 1
-                print("正在打包:  " + f"星座/{name}/{k}.jpg")
+    with open("星座/galaxy.json",encoding="UTF-8") as f:
+        print("正在打包:  " + "星座/galaxy.json")
+        dic["星座/galaxy.json"] = json.loads(f.read())
+    for galaxyname in dic["星座/galaxy.json"]:
+        starcnt = 0
+        for stardat in dic["星座/galaxy.json"][galaxyname]:
+            if stardat["star"]:
+                starcnt += 1
                 try:
-                    dic[f"星座/{name}/{k}.jpg"] = open(f"星座/{name}/{k}.jpg","rb").read()
+                    dic[f"星座/{galaxyname}/{starcnt}.jpg"] = open(f"星座/{galaxyname}/{starcnt}.jpg","rb").read()
+                    print("打包完成:  " + f"星座/{galaxyname}/{starcnt}.jpg")
                 except:
-                    print(f"警告:无法读取'星座/{name}/{k}.jpg',星图将锁定这颗星")
+                    pass
+        try:
+            dic[f"星座/{galaxyname}/label.txt"] = open(f"星座/{galaxyname}/label.txt",encoding="UTF-8").read()
+            print(f"星座'{galaxyname}'的标签设定成功")
+        except:
+            dic[f"星座/{galaxyname}/label.txt"] = ""
     pickle.dump(dic,file)
