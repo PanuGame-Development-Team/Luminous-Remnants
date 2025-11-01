@@ -1,3 +1,4 @@
+from math import sqrt
 import pygame
 import os,sys
 from threading import Thread
@@ -10,7 +11,7 @@ if not os.path.isdir("temp"):
     os.mkdir("temp")
 pygame.init()
 calc_distance = lambda x1,y1,x2,y2:(x1 - x2) ** 2 + (y1 - y2) ** 2
-def get_selected(i,mouse):
+def get_selected(mouse):
     nearest = None
     nearest_distance = 1e9
     nearest_id = [None,None]
@@ -35,6 +36,9 @@ def init():
     global imgls,angls,sidls,bgm,star,galaxypos,galaxyangls,galaxycenter,starrotated
     with open("main.pdb","rb") as file:
         dic = pload(file)
+    if dic.get("VERSION") != PACKVER:
+        pygame.quit()
+        raise Exception("PDB version incompatible.")
     star4 = cont2img("4.png",dic)
     star5 = cont2img("5.png",dic)
     star6 = cont2img("6.png",dic)
@@ -45,8 +49,8 @@ def init():
         starrotated[0].append(pygame.transform.rotate(star4,angle))
         starrotated[1].append(pygame.transform.rotate(star5,angle))
         starrotated[2].append(pygame.transform.rotate(star6,angle))
-    galaxypos = [[cont2img("星系2.png",dic)] + GAL_SPEED["星系2"]]
-    galaxyangls = [randint(0,359)]
+    galaxypos = []
+    galaxyangls = []
     bgm = pygame.mixer.Sound(savdat("ogg",dic["bg.ogg"]))
     galaxycenter = {}
     imgls = {}
@@ -102,11 +106,13 @@ def draw():
                 galaxypos[i][1] -= screensize[0] * 2
             elif galaxypos[i][1] < 0:
                 galaxypos[i][1] += screensize[0] * 2
-    select,ind = get_selected(i,mouse)
+    select,ind = get_selected(mouse)
     for galaxyname in imgls:
         for j in sidls[galaxyname]:
             j[0] += speed
-        linecolor = [i * (360 - alpha) / 360 for i in LINE_COLOR]
+        galaxycenter[galaxyname][0] += speed
+        dist = (mouse[0] - galaxycenter[galaxyname][0])**2 + (mouse[1] - galaxycenter[galaxyname][1])**2
+        linecolor = [i * (360 - alpha) / 360 * max(700000-dist,0)/700000 for i in LINE_COLOR]
         pygame.draw.aalines(screen,linecolor,False,sidls[galaxyname])
         in_screen = False
         for j in range(len(imgls[galaxyname])):
@@ -132,6 +138,10 @@ def draw():
                     j[0] -= screensize[0] * 2
                 elif j[0] < 0:
                     j[0] += screensize[0] * 2
+            if galaxycenter[galaxyname][0] > screensize[0]:
+                galaxycenter[galaxyname][0] -= screensize[0] * 2
+            elif galaxycenter[galaxyname][0] < 0:
+                galaxycenter[galaxyname][0] += screensize[0] * 2
     if showing:
         image.set_alpha(alpha)
         screen.blit(image,loc)
@@ -147,8 +157,8 @@ def draw():
 
 
 
-# screen = pygame.display.set_mode([0,0],pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.FULLSCREEN,8)
-screen = pygame.display.set_mode([1024,768])
+screen = pygame.display.set_mode([0,0],pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.FULLSCREEN,8)
+# screen = pygame.display.set_mode([1024,768])
 pygame.event.set_allowed([pygame.KEYDOWN,pygame.KEYUP,pygame.MOUSEBUTTONDOWN])
 screensize = screen.get_size()
 keepgoing = True
@@ -266,3 +276,6 @@ while keepgoing:
                 screen.fill(BG_COLOR)
     draw()
 pygame.quit()
+for filename in os.listdir("temp"):
+    os.remove("temp/" + filename)
+os.rmdir("temp")

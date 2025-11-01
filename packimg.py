@@ -1,4 +1,5 @@
 import pickle,json
+from settings import *
 import pygame
 pygame.init()
 # def imga2ls(img):
@@ -10,8 +11,7 @@ with open("logo.pdb","wb") as file:
            "logo2.png":open("logo2.png","rb").read()}
     pickle.dump(dic,file)
 with open("main.pdb","wb") as file:
-    print("正在打包:  " + "星系2.png")
-    dic = {"星系2.png":open("星系2.png","rb").read()}
+    dic = {"VERSION":PACKVER}
     print("正在打包:  " + "4.png")
     dic["4.png"] = open("4.png","rb").read()
     print("正在打包:  " + "5.png")
