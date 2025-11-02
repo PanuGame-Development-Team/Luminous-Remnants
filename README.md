@@ -1,4 +1,4 @@
-# PanuOJ
+# Luminous-Remnants
 ### 功能
 这是一个由光遇中的星图启发，使用python和pygame实现的一个类似成长纪念册的软件。
 ### 代码构建环境
