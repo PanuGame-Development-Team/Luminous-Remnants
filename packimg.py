@@ -12,6 +12,8 @@ with open("logo.pdb","wb") as file:
     pickle.dump(dic,file)
 with open("main.pdb","wb") as file:
     dic = {"VERSION":PACKVER}
+    print("正在打包:  " + "font.ttf")
+    dic["font.ttf"] = open("font.ttf","rb").read()
     print("正在打包:  " + "4.png")
     dic["4.png"] = open("4.png","rb").read()
     print("正在打包:  " + "5.png")
@@ -36,7 +38,7 @@ with open("main.pdb","wb") as file:
                 except:
                     pass
         try:
-            dic[f"星座/{galaxyname}/label.txt"] = open(f"星座/{galaxyname}/label.txt",encoding="UTF-8").read()
+            dic[f"星座/{galaxyname}/label.txt"] = open(f"星座/{galaxyname}/label.txt",encoding="UTF-8").read().strip("\n")
             print(f"星座'{galaxyname}'的标签设定成功")
         except:
             dic[f"星座/{galaxyname}/label.txt"] = ""
