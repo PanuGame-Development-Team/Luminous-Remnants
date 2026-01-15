@@ -9,14 +9,19 @@ class Galaxy(pygame.sprite.Sprite):
         self.center = center
         self.sidls = sidls
         self.stars = pygame.sprite.Group(stars)
-        self.left = None
-        self.right = None
+        self.left = 1e20
+        self.right = -1e20
+        for star in self.stars.sprites():
+            self.left = min(self.left,star.pos[0] - 15)
+            self.right = max(self.right,star.pos[0] + 15)
         self.labelfont = labelfont
         self.screensize = screensize
     def update(self,screen,speed,mousepos,alpha):
-        for j in self.sidls:
-            j[0] += speed
+        for vertex in self.sidls:
+            vertex[0] += speed
         self.center[0] += speed
+        self.left += speed
+        self.right += speed
         dist = calc_distance_sq(*mousepos,*self.center)
         linecolor = color_adapt(LINE_COLOR,BG_COLOR,alpha,LINE_SHOW_FACTOR,dist)
         fontcolor = color_adapt(LABEL_COLOR,BG_COLOR,alpha,LABEL_SHOW_FACTOR,dist)
@@ -28,15 +33,18 @@ class Galaxy(pygame.sprite.Sprite):
             screen.blit(galnamesurf,centrialize(*self.center,*galnamesurf.get_size(),0,-LABEL_DISPSIZE/2))
             screen.blit(labelsurf,centrialize(*self.center,*labelsurf.get_size(),0,LABEL_DISPSIZE/2))
         pygame.draw.aalines(screen,linecolor,False,self.sidls)
-        in_screen = True      # use self.left and self.right to determine
+        in_screen = self.left < self.screensize[0] and self.right > 0
         self.stars.update(screen,speed,alpha,in_screen)
         if not in_screen:
-            for j in self.sidls:
-                if j[0] > self.screensize[0]:
-                    j[0] -= self.screensize[0] * 2
-                elif j[0] < 0:
-                    j[0] += self.screensize[0] * 2
             if self.center[0] > self.screensize[0]:
+                for vertex in self.sidls:
+                    vertex[0] -= self.screensize[0] * 2
                 self.center[0] -= self.screensize[0] * 2
+                self.left -= self.screensize[0] * 2
+                self.right -= self.screensize[0] * 2
             elif self.center[0] < 0:
+                for vertex in self.sidls:
+                    vertex[0] += self.screensize[0] * 2
                 self.center[0] += self.screensize[0] * 2
+                self.left += self.screensize[0] * 2
+                self.right += self.screensize[0] * 2

@@ -7,9 +7,10 @@ class Star(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.resource_id = resource_id
         self.pos = pos
-        self.angle = randint(0,359)
-        self.rotation = choice([-1,1])
+        self.angle = randint(0,359) if not locked else 0
+        self.rotation = choice([-1,1]) if not locked else 0
         self.screensize = screensize
+        self.locked = locked
     def update(self,screen,speed,alpha,in_screen):
         self.angle += self.rotation
         self.angle %= 360
@@ -20,4 +21,7 @@ class Star(pygame.sprite.Sprite):
             self.pos[0] += self.screensize[0] * 2
         if in_screen:
             color = color_adapt(LINE_COLOR,BG_COLOR,alpha,LINE_SHOW_FACTOR,0)
-            pygame.draw.aalines(screen,color,1,starposls(5,15,self.angle,*self.pos))
+            if self.locked:
+                pygame.draw.aalines(screen,[128,128,128],1,starposls(5,15,0,*self.pos))
+            else:
+                pygame.draw.aalines(screen,color,1,starposls(5,15,self.angle,*self.pos))
