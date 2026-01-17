@@ -16,13 +16,13 @@ class Galaxy(pygame.sprite.Sprite):
             self.right = max(self.right,star.pos[0] + 15)
         self.labelfont = labelfont
         self.screensize = screensize
-    def update(self,screen,speed,mousepos,alpha):
+    def update(self,screen,speed,mouse,alpha):
         for vertex in self.sidls:
             vertex[0] += speed
         self.center[0] += speed
         self.left += speed
         self.right += speed
-        dist = calc_distance_sq(*mousepos,*self.center)
+        dist = calc_distance_sq(*mouse.pos,*self.center)
         linecolor = color_adapt(LINE_COLOR,BG_COLOR,alpha,LINE_SHOW_FACTOR,dist)
         fontcolor = color_adapt(LABEL_COLOR,BG_COLOR,alpha,LABEL_SHOW_FACTOR,dist)
         galnamesurf = self.labelfont.render(self.name,1,fontcolor)
@@ -34,7 +34,7 @@ class Galaxy(pygame.sprite.Sprite):
             screen.blit(labelsurf,centrialize(*self.center,*labelsurf.get_size(),0,LABEL_DISPSIZE/2))
         pygame.draw.aalines(screen,linecolor,False,self.sidls)
         in_screen = self.left < self.screensize[0] and self.right > 0
-        self.stars.update(screen,speed,alpha,in_screen)
+        self.stars.update(screen,speed,alpha,in_screen,mouse)
         if not in_screen:
             if self.center[0] > self.screensize[0]:
                 for vertex in self.sidls:

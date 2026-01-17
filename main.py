@@ -24,9 +24,8 @@ def draw():
     speed += leftbuttondown
     speed -= rightbuttondown
     speed = round(speed * SPEED_DACAY,5)
-    # select,ind = get_selected()
     screen.fill(BG_COLOR)
-    galaxy.update(screen,speed,mouse.pos,alpha)
+    galaxy.update(screen,speed,mouse,alpha)
     if showing:
         image.set_alpha(alpha)
         screen.blit(image,loc)
@@ -62,7 +61,7 @@ while keepgoing:
             elif event.key == pygame.K_RIGHT:
                 rightbuttondown = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse.rotating = True
+            mouse.click(screen)
             if select:
                 showing = True
                 loc = [0,0]
