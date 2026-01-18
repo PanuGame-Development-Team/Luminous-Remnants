@@ -21,14 +21,12 @@ from lib import *
 def draw():
     global speed,select,screen,clock
     starttime = currenttime()
-    speed += leftbuttondown
-    speed -= rightbuttondown
+    if not mouse.showing:
+        speed += leftbuttondown
+        speed -= rightbuttondown
     speed = round(speed * SPEED_DACAY,5)
     screen.fill(BG_COLOR)
-    galaxy.update(screen,speed,mouse,alpha)
-    if showing:
-        image.set_alpha(alpha)
-        screen.blit(image,loc)
+    galaxy.update(screen,speed,mouse,mouse.alpha)
     mouse.update(screen,pygame.mouse.get_pos())
     pygame.display.update()
     if PERFORMANCE_TRACK:
@@ -43,7 +41,6 @@ leftbuttondown = rightbuttondown = False
 showing = False
 select = False
 showing = False
-alpha = 0
 bgm.play(-1)
 mouse = Mouse()
 while keepgoing:
@@ -61,41 +58,7 @@ while keepgoing:
             elif event.key == pygame.K_RIGHT:
                 rightbuttondown = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse.click(screen)
-            if select:
-                showing = True
-                loc = [0,0]
-                loc[0] = abs(screensize[0] - select.get_size()[0]) / 2
-                loc[1] = abs(screensize[1] - select.get_size()[1]) / 2
-                image = pygame.transform.smoothscale(select,select.get_size())
-            if showing:
-                innerkeepgoing = True
-                leftbuttondown = rightbuttondown = False
-                alpha = 0
-                while innerkeepgoing:
-                    for event in pygame.event.get():
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                innerkeepgoing = False
-                                keepgoing = False
-                                alpha = -ALPHA_DACAY
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            innerkeepgoing = False
-                    if alpha < 255 - ALPHA_DACAY + 1:
-                        alpha += ALPHA_DACAY
-                    else:
-                        alpha = 255
-                    draw()
-                while alpha > 0:
-                    for event in pygame.event.get():
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                keepgoing = False
-                                alpha = ALPHA_DACAY
-                    draw()
-                    alpha -= ALPHA_DACAY
-                alpha = 0
-                showing = False
+            mouse.click()
     draw()
 pygame.quit()
 for filename in os.listdir("temp"):

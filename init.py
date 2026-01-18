@@ -1,7 +1,6 @@
 import pygame
 import os
 from threading import Thread
-from random import randint
 from pickle import load as pload
 from uuid import uuid4
 from settings import *
@@ -110,3 +109,4 @@ while True:
     pygame.display.update()
     clock.tick(TICK_SPEED)
 del init,first,alpha,deltaalpha,logo,initd,logoloc
+pygame.mouse.set_visible(False)
