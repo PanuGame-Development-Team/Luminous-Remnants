@@ -1,6 +1,7 @@
 import pygame
 from lib import *
 from init import imgresource,screensize
+from settings import *
 class Mouse(pygame.sprite.Sprite):
     angle = 0
     rotating = False
@@ -29,9 +30,9 @@ class Mouse(pygame.sprite.Sprite):
                 self.showing = False
             self.image.set_alpha(self.alpha)
             screen.blit(self.image,self.loc)
-        pygame.draw.lines(screen,[255,255,255],1,starposls(3,15,self.angle,*self.pos))
-        pygame.draw.lines(screen,[255,255,255],1,starposls(3,15,60 + self.angle,*self.pos))
-        pygame.draw.circle(screen,[255,255,255],self.pos,1,1)
+        pygame.draw.lines(screen,MOUSE.COLOR,1,starposls(3,STAR.RADIUS,self.angle,*self.pos))
+        pygame.draw.lines(screen,MOUSE.COLOR,1,starposls(3,STAR.RADIUS,60 + self.angle,*self.pos))
+        pygame.draw.circle(screen,MOUSE.COLOR,self.pos,1,1)
     def click(self):
         self.rotating = True
         if not self.showing and self.resource_id:

@@ -22,17 +22,17 @@ def init():
     global galaxy,bgm,labelfont,imgresource
     with open("main.pdb","rb") as file:
         dic = pload(file)
-    if dic.get("VERSION") != PACKVER:
+    if dic.get("VERSION") != CONSTANTS.PACKVER:
         pygame.quit()
         raise Exception("PDB version incompatible.")
-    labelfont = pygame.font.Font(savdat("ttf",dic["font.ttf"]),LABEL_DISPSIZE)
+    labelfont = pygame.font.Font(savdat("ttf",dic["font.ttf"]),GALAXY.LABEL_DISPSIZE)
     bgm = pygame.mixer.Sound(savdat("ogg",dic["bg.ogg"]))
     galaxy = pygame.sprite.Group()
     imgresource = {}
     for galaxyname in dic["星座/galaxy.json"]:
         label = dic[f"星座/{galaxyname}/label.txt"]
         center = [0,0]
-        scaled = [[int(stardat["pos"][0]/INITIAL_SCRSIZE[0]*screensize[0]),int(stardat["pos"][1]/INITIAL_SCRSIZE[1]*screensize[1]),stardat["star"]] for stardat in dic["星座/galaxy.json"][galaxyname]]
+        scaled = [[int(stardat["pos"][0]/CONSTANTS.INITIAL_SCRSIZE[0]*screensize[0]),int(stardat["pos"][1]/CONSTANTS.INITIAL_SCRSIZE[1]*screensize[1]),stardat["star"]] for stardat in dic["星座/galaxy.json"][galaxyname]]
         starcnt = 0
         stars = []
         for stardat in scaled:
@@ -63,7 +63,7 @@ screensize = screen.get_size()
 keepgoing = True
 first = True
 alpha = 0
-deltaalpha = ALPHA_DACAY
+deltaalpha = GENERAL.ALPHA_DACAY
 with open("logo.pdb","rb") as file:
     temp = pload(file)
 logo2 = cont2img("logo2.png",temp)
@@ -73,21 +73,21 @@ initd = Thread(target=init)
 logo2loc = [(screensize[0]-logo2.get_size()[0])/2,(screensize[1]+logo.get_size()[1])/2]
 logoloc = [(screensize[0]-logo.get_size()[0])/2,(screensize[1]-logo.get_size()[1])/2]
 while True:
-    screen.fill(BG_COLOR)
+    screen.fill(GENERAL.BG_COLOR)
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 sys.exit()
-    if alpha >= 255 - ALPHA_DACAY + 1:
+    if alpha >= 255 - GENERAL.ALPHA_DACAY + 1:
         if first:
             deltaalpha = 0
             initd.start()
             first = False
         if not initd.is_alive():
-            deltaalpha = -ALPHA_DACAY
-            while alpha > ALPHA_DACAY - 1:
-                screen.fill(BG_COLOR)
+            deltaalpha = -GENERAL.ALPHA_DACAY
+            while alpha > GENERAL.ALPHA_DACAY - 1:
+                screen.fill(GENERAL.BG_COLOR)
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
@@ -99,7 +99,7 @@ while True:
                 screen.blit(logo,logoloc)
                 screen.blit(logo2,logo2loc)
                 pygame.display.update()
-                clock.tick(TICK_SPEED)
+                clock.tick(CONSTANTS.TICK_SPEED)
             break
     alpha += deltaalpha
     logo.set_alpha(alpha)
@@ -107,6 +107,6 @@ while True:
     screen.blit(logo,logoloc)
     screen.blit(logo2,logo2loc)
     pygame.display.update()
-    clock.tick(TICK_SPEED)
+    clock.tick(CONSTANTS.TICK_SPEED)
 del init,first,alpha,deltaalpha,logo,initd,logoloc
 pygame.mouse.set_visible(False)
