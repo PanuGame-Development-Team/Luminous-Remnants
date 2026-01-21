@@ -6,6 +6,7 @@ from uuid import uuid4
 from settings import *
 from sprites.galaxy import Galaxy
 from sprites.star import Star
+from lib.autoplay import *
 import sys
 if not os.path.isdir("temp"):
     os.mkdir("temp")
@@ -29,6 +30,7 @@ def init():
     bgm = pygame.mixer.Sound(savdat("ogg",dic["bg.ogg"]))
     galaxy = pygame.sprite.Group()
     imgresource = {}
+    startot = 0
     for galaxyname in dic["星座/galaxy.json"]:
         label = dic[f"星座/{galaxyname}/label.txt"]
         center = [0,0]
@@ -38,6 +40,7 @@ def init():
         for stardat in scaled:
             if stardat[2]:
                 starcnt += 1
+                startot += 1
                 center[0] += stardat[0]
                 center[1] += stardat[1]
                 if f"星座/{galaxyname}/{starcnt}.jpg" in dic:
@@ -56,6 +59,18 @@ def init():
         center[1] /= starcnt
         sidls = [stardat[:2] for stardat in scaled]
         galaxy.add(Galaxy(galaxyname,label,center,sidls,stars,labelfont,screensize))
+    if AUTOPLAY.ENABLE:
+        bgm2 = pygame.mixer.Sound(savdat("ogg",dic["bg2.ogg"]))
+        val1 = bgm_val(bgm.get_length(),startot,AUTOPLAY.TIME)[0]
+        val12 = bgm_val(bgm.get_length() * 2,startot,AUTOPLAY.TIME)[0]
+        val2 = bgm_val(bgm2.get_length(),startot,AUTOPLAY.TIME)[0]
+        val22 = bgm_val(bgm2.get_length() * 2,startot,AUTOPLAY.TIME)[0]
+        mx = max(val1,val12,val2,val22)
+        if mx == -1:
+            bgm = None
+            raise ValueError("Stars are so few that autoplay is not capable.")
+        if mx == val2 or mx == val22:
+            bgm = bgm2
 screen = pygame.display.set_mode([0,0],pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.FULLSCREEN,8)
 # screen = pygame.display.set_mode([1024,768])
 pygame.event.set_allowed([pygame.KEYDOWN,pygame.KEYUP,pygame.MOUSEBUTTONDOWN])

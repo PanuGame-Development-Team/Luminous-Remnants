@@ -28,4 +28,9 @@ class STAR:
         REG_FACTOR = (1 - 1 / (SPEED * TICK + 1))
 class MOUSE:
     COLOR = [255,255,255]
+class AUTOPLAY:
+    ENABLE = False
+    class TIME:
+        MOVEMOUSE = 1
+        FADE = 1.5
 from properties import *
