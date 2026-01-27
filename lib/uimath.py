@@ -20,3 +20,19 @@ def approaching(hovertick,min,max,CONSTOBJ):
     return (1 - 1 / (CONSTOBJ.SPEED * hovertick + 1)) / CONSTOBJ.REG_FACTOR * (max - min)
 def sectionformula(x1,y1,x2,y2,factor):
     return [(x2 - x1) * factor + x1,(y2 - y1) * factor + y1]
+def scrolling_asdelta(tick,maxtick,delta):
+    return (_math.sin(((tick + 1) / (maxtick + 1) - 0.5) * _math.pi) - _math.sin((tick / (maxtick + 1) - 0.5) * _math.pi)) * delta / 2
+def find_next(dest,galaxy):
+    dest[1] += 1
+    if dest[1] >= len(galaxy.sprites()[dest[0]].stars.sprites()):
+        dest[1] = 0
+        dest[0] += 1
+        if dest[0] >= len(galaxy.sprites()):
+            dest[0] = 0
+    while galaxy.sprites()[dest[0]].stars.sprites()[dest[1]].locked:
+        dest[1] += 1
+        if dest[1] >= len(galaxy.sprites()[dest[0]].stars.sprites()):
+            dest[1] = 0
+            dest[0] += 1
+            if dest[0] >= len(galaxy.sprites()):
+                dest[0] = 0

@@ -38,6 +38,7 @@ while keepgoing:
             speed -= rightbuttondown
         speed = round(speed * GENERAL.SPEED_DACAY,5)
     else:
+        speed = scroller.speed()
         if time() - t0 > sched[0][0]:
             if sched[0][1] == "click":
                 mouse.click()
@@ -47,17 +48,13 @@ while keepgoing:
                 mouse.autoplay.dest = galaxy.sprites()[dest[0]].stars.sprites()[dest[1]].pos
                 mouse.autoplay.outset = mouse.pos
                 mouse.autoplay.moving = True
-                dest[1] += 1
-                if dest[1] >= len(galaxy.sprites()[dest[0]].stars.sprites()):
-                    dest[1] = 0
-                    dest[0] += 1
-                while galaxy.sprites()[dest[0]].stars.sprites()[dest[1]].locked:
-                    dest[1] += 1
-                    if dest[1] >= len(galaxy.sprites()[dest[0]].stars.sprites()):
-                        dest[1] = 0
-                        dest[0] += 1
+                find_next(dest,galaxy)
             elif sched[0][1] == "checkbg":
-                pass
+                gal = galaxy.sprites()[dest[0]]
+                if gal.right > screensize[0] * (1 - AUTOPLAY.SCROLL_BG_FACTOR):
+                    scroller.scroll(gal.left - screensize[0] * AUTOPLAY.SCROLL_BG_FACTOR)
+                if gal.right < 0:
+                    scroller.scroll(gal.left - screensize[0] * (AUTOPLAY.SCROLL_BG_FACTOR - 2))
             sched.pop(0)
     screen.fill(GENERAL.BG_COLOR)
     galaxy.update(screen,speed,mouse,mouse.alpha)

@@ -1,6 +1,6 @@
 class CONSTANTS:
-    VERSION = "1.2-260118-alpha"
-    PACKVER = "1.2"
+    VERSION = "1.2.1-260127-beta"
+    PACKVER = "1.2-rev1"
     INITIAL_SCRSIZE = [1536,864]
     TICK_SPEED = 60
 class DEBUG:
@@ -30,13 +30,14 @@ class MOUSE:
     COLOR = [255,255,255]
 class AUTOPLAY:
     ENABLE = False
+    SCROLL_BG_FACTOR = 0.2
     class TIME:
         MOVEMOUSE = 1
         FADE = 1.5
         CACHE = 0.5
     class MOUSE:
         TICK = None
-        SPEED = 0.2
+        SPEED = 0.1
         REG_FACTOR = None
 from properties import *
 AUTOPLAY.MOUSE.TICK = (AUTOPLAY.TIME.MOVEMOUSE + AUTOPLAY.TIME.FADE - AUTOPLAY.TIME.CACHE) * CONSTANTS.TICK_SPEED

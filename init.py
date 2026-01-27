@@ -20,7 +20,7 @@ def cont2img(index:str,dic:dict):
     filename = savdat(index,dic[index])
     return pygame.image.load(filename).convert_alpha()
 def init():
-    global galaxy,bgm,labelfont,imgresource,sched
+    global galaxy,bgm,labelfont,imgresource,sched,scroller
     with open("main.pdb","rb") as file:
         dic = pload(file)
     if dic.get("VERSION") != CONSTANTS.PACKVER:
@@ -40,10 +40,10 @@ def init():
         for stardat in scaled:
             if stardat[2]:
                 starcnt += 1
-                startot += 1
                 center[0] += stardat[0]
                 center[1] += stardat[1]
                 if f"星座/{galaxyname}/{starcnt}.jpg" in dic:
+                    startot += 1
                     select = cont2img(f"星座/{galaxyname}/{starcnt}.jpg",dic).convert()
                     if screensize[0] / select.get_size()[0] > screensize[1] / select.get_size()[1]:
                         scale = screensize[1] / select.get_size()[1]
@@ -70,6 +70,7 @@ def init():
         if val[0] == -1:
             raise ValueError("Stars are not enough to support autoplay.")
         sched = schedule(startot,val[1])
+        scroller = Autoscroll_handler(val[1])
 screen = pygame.display.set_mode([0,0],pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.FULLSCREEN,8)
 # screen = pygame.display.set_mode([1024,768])
 pygame.event.set_allowed([pygame.KEYDOWN,pygame.KEYUP,pygame.MOUSEBUTTONDOWN])
