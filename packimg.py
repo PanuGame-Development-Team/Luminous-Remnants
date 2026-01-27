@@ -7,17 +7,9 @@ with open("logo.pdb","wb") as file:
            "logo2.png":open("resources/logo2.png","rb").read()}
     pickle.dump(dic,file)
 with open("main.pdb","wb") as file:
-    dic = {"VERSION":PACKVER}
+    dic = {"VERSION":CONSTANTS.PACKVER}
     print("正在打包:  " + "font.ttf")
     dic["font.ttf"] = open("resources/font.ttf","rb").read()
-    print("正在打包:  " + "4.png")
-    dic["4.png"] = open("resources/4.png","rb").read()
-    print("正在打包:  " + "5.png")
-    dic["5.png"] = open("resources/5.png","rb").read()
-    print("正在打包:  " + "6.png")
-    dic["6.png"] = open("resources/6.png","rb").read()
-    print("正在打包:  " + "lock.png")
-    dic["lock.png"] = open("resources/lock.png","rb").read()
     print("正在打包:  " + "bg.ogg")
     dic["bg.ogg"] = open("resources/bg.ogg","rb").read()
     print("正在打包:  " + "bg2.ogg")

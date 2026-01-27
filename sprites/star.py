@@ -26,7 +26,8 @@ class Star(pygame.sprite.Sprite):
             self.pos[0] += self.screensize[0] * 2
         if in_screen:
             if self.locked:
-                pygame.draw.aalines(screen,STAR.LOCKED_COLOR,1,starposls(5,STAR.RADIUS,0,*self.pos))
+                color = color_adapt(STAR.LOCKED_COLOR,GENERAL.BG_COLOR,alpha,STAR.SHOW_FACTOR,0)
+                pygame.draw.aalines(screen,color,1,starposls(5,STAR.RADIUS,0,*self.pos))
             else:
                 color = color_adapt(STAR.COLOR,GENERAL.BG_COLOR,alpha,STAR.SHOW_FACTOR,0)
                 dist = calc_distance_sq(*self.pos,*mouse.pos) 

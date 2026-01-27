@@ -18,3 +18,5 @@ def centrialize(x1,y1,x2,y2,xoffset,yoffset):
     return [x1 - x2 / 2 + xoffset,y1 - y2 / 2 + yoffset]
 def approaching(hovertick,min,max,CONSTOBJ):
     return (1 - 1 / (CONSTOBJ.SPEED * hovertick + 1)) / CONSTOBJ.REG_FACTOR * (max - min)
+def sectionformula(x1,y1,x2,y2,factor):
+    return [(x2 - x1) * factor + x1,(y2 - y1) * factor + y1]

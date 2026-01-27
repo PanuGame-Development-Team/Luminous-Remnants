@@ -20,7 +20,7 @@ def cont2img(index:str,dic:dict):
     filename = savdat(index,dic[index])
     return pygame.image.load(filename).convert_alpha()
 def init():
-    global galaxy,bgm,labelfont,imgresource
+    global galaxy,bgm,labelfont,imgresource,sched
     with open("main.pdb","rb") as file:
         dic = pload(file)
     if dic.get("VERSION") != CONSTANTS.PACKVER:
@@ -61,16 +61,15 @@ def init():
         galaxy.add(Galaxy(galaxyname,label,center,sidls,stars,labelfont,screensize))
     if AUTOPLAY.ENABLE:
         bgm2 = pygame.mixer.Sound(savdat("ogg",dic["bg2.ogg"]))
-        val1 = bgm_val(bgm.get_length(),startot,AUTOPLAY.TIME)[0]
-        val12 = bgm_val(bgm.get_length() * 2,startot,AUTOPLAY.TIME)[0]
-        val2 = bgm_val(bgm2.get_length(),startot,AUTOPLAY.TIME)[0]
-        val22 = bgm_val(bgm2.get_length() * 2,startot,AUTOPLAY.TIME)[0]
-        mx = max(val1,val12,val2,val22)
-        if mx == -1:
-            bgm = None
-            raise ValueError("Stars are so few that autoplay is not capable.")
-        if mx == val2 or mx == val22:
-            bgm = bgm2
+        ls = []
+        ls.append((bgm_val(bgm.get_length(),startot),bgm))
+        ls.append((bgm_val(bgm.get_length() * 2,startot),bgm))
+        ls.append((bgm_val(bgm2.get_length(),startot),bgm2))
+        ls.append((bgm_val(bgm2.get_length() * 2,startot),bgm2))
+        val,bgm = max(*ls,key=lambda x:x[0][0])
+        if val[0] == -1:
+            raise ValueError("Stars are not enough to support autoplay.")
+        sched = schedule(startot,val[1])
 screen = pygame.display.set_mode([0,0],pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.FULLSCREEN,8)
 # screen = pygame.display.set_mode([1024,768])
 pygame.event.set_allowed([pygame.KEYDOWN,pygame.KEYUP,pygame.MOUSEBUTTONDOWN])

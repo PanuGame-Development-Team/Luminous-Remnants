@@ -2,18 +2,34 @@ import pygame
 from lib import *
 from init import imgresource,screensize
 from settings import *
+class _AUTOPLAY:
+    dest = [0,0]
+    moving = False
+    tick = 0
+    outset = [screensize[0]/2,screensize[1]/2]
 class Mouse(pygame.sprite.Sprite):
     angle = 0
     rotating = False
-    pos = [0,0]
+    pos = [screensize[0]/2,screensize[1]/2]
     resource_id = None
     showing = False
     image = None
     alpha = 0
     dalpha = 0
     loc = [0,0]
+    autoplay = _AUTOPLAY()
     def update(self,screen,mousepos):
-        self.pos = mousepos
+        if not AUTOPLAY.ENABLE:
+            self.pos = mousepos
+        else:
+            if self.autoplay.moving:
+                self.pos = sectionformula(*self.autoplay.outset,*self.autoplay.dest,approaching(self.autoplay.tick,0,1,AUTOPLAY.MOUSE))
+                self.autoplay.tick += 1
+                if self.autoplay.tick > AUTOPLAY.MOUSE.TICK:
+                    self.autoplay.tick = 0
+                    self.autoplay.moving = False
+            else:
+                self.autoplay.outset = self.pos
         if self.rotating:
             self.angle += 3
             if self.angle >= 60:

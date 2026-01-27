@@ -2,9 +2,12 @@ import pygame
 from init import *
 import os
 from settings import *
-from time import time as currenttime
 from sprites.mouse import Mouse
 from lib import *
+if AUTOPLAY.ENABLE:
+    from time import time
+    t0 = time()
+    dest = [0,0]
 speed = 0
 leftbuttondown = rightbuttondown = False
 showing = False
@@ -21,17 +24,41 @@ while keepgoing:
                 leftbuttondown = True
             elif event.key == pygame.K_RIGHT:
                 rightbuttondown = True
-        if event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 leftbuttondown = False
             elif event.key == pygame.K_RIGHT:
                 rightbuttondown = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse.click()
-    if not mouse.showing:
-        speed += leftbuttondown
-        speed -= rightbuttondown
-    speed = round(speed * GENERAL.SPEED_DACAY,5)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if not AUTOPLAY.ENABLE:
+                mouse.click()
+    if not AUTOPLAY.ENABLE:
+        if not mouse.showing:
+            speed += leftbuttondown
+            speed -= rightbuttondown
+        speed = round(speed * GENERAL.SPEED_DACAY,5)
+    else:
+        if time() - t0 > sched[0][0]:
+            if sched[0][1] == "click":
+                mouse.click()
+            elif sched[0][1] == "quit":
+                keepgoing = False
+            elif sched[0][1] == "move":
+                mouse.autoplay.dest = galaxy.sprites()[dest[0]].stars.sprites()[dest[1]].pos
+                mouse.autoplay.outset = mouse.pos
+                mouse.autoplay.moving = True
+                dest[1] += 1
+                if dest[1] >= len(galaxy.sprites()[dest[0]].stars.sprites()):
+                    dest[1] = 0
+                    dest[0] += 1
+                while galaxy.sprites()[dest[0]].stars.sprites()[dest[1]].locked:
+                    dest[1] += 1
+                    if dest[1] >= len(galaxy.sprites()[dest[0]].stars.sprites()):
+                        dest[1] = 0
+                        dest[0] += 1
+            elif sched[0][1] == "checkbg":
+                pass
+            sched.pop(0)
     screen.fill(GENERAL.BG_COLOR)
     galaxy.update(screen,speed,mouse,mouse.alpha)
     mouse.update(screen,pygame.mouse.get_pos())
