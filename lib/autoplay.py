@@ -1,5 +1,5 @@
 from settings import *
-from .uimath import scrolling_asdelta
+from .uimath import scrolling
 def bgm_val(sec,starcnt):
     sec -= AUTOPLAY.TIME.MOVEMOUSE * starcnt + (AUTOPLAY.TIME.FADE * 2) * starcnt + AUTOPLAY.TIME.FADE
     sec /= starcnt
@@ -24,9 +24,10 @@ def schedule(starcnt,dispsec):
     sch.append((time,"quit"))
     return sch
 class Autoscroll_handler:
-    tick = 0
+    tick = 1
     scrolling = False
     delta = 0
+    former = 0
     def __init__(self,dispsec):
         self.maxtick = (dispsec - AUTOPLAY.TIME.CACHE) * CONSTANTS.TICK_SPEED
     def scroll(self,delta):
@@ -36,9 +37,12 @@ class Autoscroll_handler:
         if not self.scrolling:
             return 0
         else:
-            s = scrolling_asdelta(self.tick,self.maxtick,self.delta)
+            scr = scrolling(self.tick,self.maxtick,self.delta)
+            s = scr - self.former
+            self.former = scr
             self.tick += 1
             if self.tick > self.maxtick:
                 self.scrolling = False
-                self.tick = 0
+                self.tick = 1
+                self.former = 0
             return -s

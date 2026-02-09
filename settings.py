@@ -1,3 +1,5 @@
+from os.path import isfile
+from json import loads
 class CONSTANTS:
     VERSION = "1.2.1-260127-beta"
     PACKVER = "1.2-rev1"
@@ -39,6 +41,47 @@ class AUTOPLAY:
         TICK = None
         SPEED = 0.1
         REG_FACTOR = None
-from properties import *
+class METEOR:
+    ENABLE = True
+    LENGTH = [300,600]
+    STAY_TICK = 120    # >=slide_tick
+    SLIDE_TICK = 90
+    COLOR = [255,255,255]
+    SHOW_FACTOR = 360
+    FRONT_STAR_RADIUS = 15
+    BACK_STAR_RADIUS = 12
+    ROTATION = 3
+    FRONT_COVER_RADIUS = 20
+    BACK_COVER_RADIUS = 16
+    MIN_PERIOD = 300
+    MAX_PERIOD = 1200
+    MIN_COUNT = 50
+    MAX_COUNT = 250
+if isfile("properties"):
+    with open("properties") as file:
+        section = "GENERAL"
+        for i in file.readlines():
+            line = i.strip("\n")
+            if line in ["[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[MOUSE]","[AUTOPLAY]","[METEOR]"]:
+                section = line.replace("[","").replace("]","")
+                continue
+            if not "=" in line:
+                raise ValueError("Invalid assignment statement in properties.")
+            [dest,value] = line.split("=",1)
+            try:
+                value = loads(value)
+            except:
+                raise ValueError("Invalid assignment statement in properties.")
+            dest = dest.split(".")
+            variable = globals()[section]
+            for x in dest[:-1]:
+                if hasattr(variable,x):
+                    variable = getattr(variable,x)
+                else:
+                    raise ValueError("Invalid assignment statement in properties.")
+            if hasattr(variable,dest[-1]):
+                setattr(variable,dest[-1],value)
+            else:
+                raise ValueError("Invalid assignment statement in properties.")
 AUTOPLAY.MOUSE.TICK = (AUTOPLAY.TIME.MOVEMOUSE + AUTOPLAY.TIME.FADE - AUTOPLAY.TIME.CACHE) * CONSTANTS.TICK_SPEED
 AUTOPLAY.MOUSE.REG_FACTOR = (1 - 1 / (AUTOPLAY.MOUSE.SPEED * AUTOPLAY.MOUSE.TICK + 1))
