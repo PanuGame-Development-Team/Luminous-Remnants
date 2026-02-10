@@ -7,6 +7,7 @@ from settings import *
 from sprites.galaxy import Galaxy
 from sprites.star import Star
 from lib.autoplay import *
+from lib import color_adapt
 import sys
 if not os.path.isdir("temp"):
     os.mkdir("temp")
@@ -85,6 +86,12 @@ logo2 = cont2img("logo2.png",temp)
 logo = cont2img("logo.png",temp)
 clock = pygame.time.Clock()
 initd = Thread(target=init)
+footnotefont = pygame.font.SysFont("monospace",INIT.FOOTNOTE_FONT_SIZE)
+footnotes = [CONSTANTS.VERSION,CONSTANTS.APP_NAME]
+if AUTOPLAY.ENABLE:
+    footnotes.append("AUTOPLAY")
+if not METEOR.ENABLE:
+    footnotes.append("NO METEOR")
 logo2loc = [(screensize[0]-logo2.get_size()[0])/2,(screensize[1]+logo.get_size()[1])/2]
 logoloc = [(screensize[0]-logo.get_size()[0])/2,(screensize[1]-logo.get_size()[1])/2]
 while True:
@@ -99,29 +106,21 @@ while True:
             deltaalpha = 0
             initd.start()
             first = False
-        if not initd.is_alive():
+        elif not initd.is_alive():
             deltaalpha = -GENERAL.ALPHA_DACAY
-            while alpha > GENERAL.ALPHA_DACAY - 1:
-                screen.fill(GENERAL.BG_COLOR)
-                for event in pygame.event.get():
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            pygame.quit()
-                            sys.exit()
-                alpha += deltaalpha
-                logo.set_alpha(alpha)
-                logo2.set_alpha(alpha)
-                screen.blit(logo,logoloc)
-                screen.blit(logo2,logo2loc)
-                pygame.display.update()
-                clock.tick(CONSTANTS.TICK_SPEED)
-            break
     alpha += deltaalpha
+    if alpha < 0:
+        break
+    h = screensize[1]
+    for note in footnotes:
+        surf = footnotefont.render(note,True,color_adapt(INIT.FOOTNOTE_COLOR,GENERAL.BG_COLOR,255-alpha,255,0))
+        h -= surf.get_height()
+        screen.blit(surf,[screensize[0] - surf.get_width(),h])
     logo.set_alpha(alpha)
     logo2.set_alpha(alpha)
     screen.blit(logo,logoloc)
     screen.blit(logo2,logo2loc)
     pygame.display.update()
     clock.tick(CONSTANTS.TICK_SPEED)
-del init,first,alpha,deltaalpha,logo,initd,logoloc
+del init,logo,logo2,initd,surf,footnotefont
 pygame.mouse.set_visible(False)

@@ -1,10 +1,15 @@
 from os.path import isfile
 from json import loads
 class CONSTANTS:
-    VERSION = "1.2.2-260210-RC1"
+    APP_NAME = "Luminous-Remnants"
+    VERSION = "1.3.0-260210-stable"
     PACKVER = "1.2-rev1"
     INITIAL_SCRSIZE = [1536,864]
     TICK_SPEED = 60
+class INIT:
+    DEFAULT_FONT = ["firacode","couriernew","consolas","monaco","monospace"]
+    FOOTNOTE_FONT_SIZE = 24
+    FOOTNOTE_COLOR = [109,158,235]
 class DEBUG:
     ...
 class GENERAL:
@@ -68,7 +73,7 @@ if isfile("properties"):
         section = "GENERAL"
         for i in file.readlines():
             line = i.strip("\n")
-            if line in ["[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[MOUSE]","[AUTOPLAY]","[METEOR]"]:
+            if line in ["[INIT]","[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[MOUSE]","[AUTOPLAY]","[METEOR]"]:
                 section = line.replace("[","").replace("]","")
                 continue
             if not "=" in line:
