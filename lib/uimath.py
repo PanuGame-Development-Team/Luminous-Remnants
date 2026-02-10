@@ -1,4 +1,5 @@
 import math as _math
+from random import random as _random
 from settings import *
 def starposls(n,r,ang,offx,offy):
     ls = []
@@ -39,3 +40,7 @@ def find_next(dest,galaxy):
 def circle_border(radius,centerx,centery,destx,desty):
     pol = _math.sqrt(calc_distance_sq(centerx,centery,destx,desty)) / radius
     return [centerx + (destx - centerx) / pol,centery + (desty - centery) / pol]
+def period_secion(val,max,min,period):
+    return (_math.sin(val / period * 2 * _math.pi) + 1) / 2 * (max - min) + min
+def randlr(min,max):
+    return _random() * (max - min) + min

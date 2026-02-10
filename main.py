@@ -3,7 +3,7 @@ from init import *
 import os
 from settings import *
 from sprites.mouse import Mouse
-from sprites.meteor import Meteor
+from sprites.meteor import MeteorRainHandler
 from lib import *
 if AUTOPLAY.ENABLE:
     from time import time
@@ -16,7 +16,9 @@ select = False
 showing = False
 bgm.play(-1)
 mouse = Mouse()
-meteor = pygame.sprite.Group()
+if METEOR.ENABLE:
+    meteor = pygame.sprite.Group()
+    mrhandler = MeteorRainHandler()
 while keepgoing:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -60,7 +62,9 @@ while keepgoing:
             sched.pop(0)
     screen.fill(GENERAL.BG_COLOR)
     galaxy.update(screen,speed,mouse,mouse.alpha)
-    meteor.update(screen,speed,mouse.alpha)
+    if METEOR.ENABLE:
+        mrhandler.handle(meteor)
+        meteor.update(screen,speed,mouse.alpha)
     mouse.update(screen,pygame.mouse.get_pos())
     pygame.display.update()
     clock.tick(CONSTANTS.TICK_SPEED)

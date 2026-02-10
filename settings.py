@@ -1,7 +1,7 @@
 from os.path import isfile
 from json import loads
 class CONSTANTS:
-    VERSION = "1.2.1-260127-beta"
+    VERSION = "1.2.2-260210-RC1"
     PACKVER = "1.2-rev1"
     INITIAL_SCRSIZE = [1536,864]
     TICK_SPEED = 60
@@ -44,6 +44,8 @@ class AUTOPLAY:
 class METEOR:
     ENABLE = True
     LENGTH = [300,600]
+    ANGLE = [30,60]
+    FROMY_FACTOR = 0.3
     STAY_TICK = 120    # >=slide_tick
     SLIDE_TICK = 90
     COLOR = [255,255,255]
@@ -53,10 +55,14 @@ class METEOR:
     ROTATION = 3
     FRONT_COVER_RADIUS = 20
     BACK_COVER_RADIUS = 16
-    MIN_PERIOD = 300
-    MAX_PERIOD = 1200
-    MIN_COUNT = 50
-    MAX_COUNT = 250
+    class RAIN:
+        MIN_PROBABILITY = 0.01
+        MAX_PROBABILITY = 0.05
+        PROBABILITY_PERIOD = 600
+        STAY_TICK = 480
+        METEOR_LIMIT = 8
+        DURATION = 600
+        TICK_PER_MET = 6
 if isfile("properties"):
     with open("properties") as file:
         section = "GENERAL"
