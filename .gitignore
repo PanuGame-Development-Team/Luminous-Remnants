@@ -5,3 +5,9 @@ label.txt
 __pycache__/
 /resources/星座/*/*.jpg
 /properties
+/releases/
+/venv/
+/main.build/
+/main.dist/
+/main.onefile-build/
+/main.bin

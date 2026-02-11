@@ -25,7 +25,7 @@ class Meteor(pygame.sprite.Sprite):
             end = self.outset
         else:
             end = sectionformula(*self.outset,*self.dest,scrolling(self.tick - METEOR.SLIDE_TICK,METEOR.STAY_TICK,1))
-        color = color_adapt(STAR.COLOR,GENERAL.BG_COLOR,alpha,STAR.SHOW_FACTOR,0)
+        color = color_adapt(METEOR.COLOR,GENERAL.BG_COLOR,alpha,METEOR.SHOW_FACTOR,0)
         if calc_distance_sq(*start,*end) > (METEOR.FRONT_COVER_RADIUS + METEOR.BACK_COVER_RADIUS) ** 2:
             linestart = circle_border(METEOR.FRONT_COVER_RADIUS,*start,*end)
             lineend = circle_border(METEOR.BACK_COVER_RADIUS,*end,*start)
