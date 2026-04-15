@@ -8,7 +8,8 @@ from lib import *
 if AUTOPLAY.ENABLE:
     from time import time
     t0 = time()
-    dest = [0,0]
+    dest = [0,-1]
+    find_next(dest,galaxy)
 speed = 0
 leftbuttondown = rightbuttondown = False
 showing = False
