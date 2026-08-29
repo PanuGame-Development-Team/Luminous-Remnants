@@ -1,6 +1,6 @@
 import pygame
 from lib import *
-from settings import *
+from properties import *
 class Galaxy(pygame.sprite.Sprite):
     def __init__(self,name,label,center,sidls,stars,labelfont,screensize,*groups):
         super().__init__(*groups)

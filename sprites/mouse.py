@@ -1,7 +1,7 @@
 import pygame
 from lib import *
 from init import imgresource,screensize
-from settings import *
+from properties import *
 class _AUTOPLAY:
     dest = [0,0]
     moving = False

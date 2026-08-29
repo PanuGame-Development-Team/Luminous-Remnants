@@ -11,19 +11,20 @@ class INIT:
     FOOTNOTE_FONT_SIZE = 24
     FOOTNOTE_COLOR = [109,158,235]
 class DEBUG:
-    ...
+    WINDOW = False
+    POS_STANDARD = False
 class GENERAL:
-    SPEED_DACAY = 0.95
     BG_COLOR = [0,0,30]
-    ALPHA_DACAY = 3
-class GALAXY:
+    GRAPH_WIDTH = 2
     VISIBLE_DISTANCE = 836.66
+class GALAXY:
     LINE_COLOR = [255,255,255]
     LINE_SHOW_FACTOR = 360
     LABEL_DISPSIZE = 100
     LABEL_COLOR = [109,158,235]
     LABEL_SHOW_FACTOR = 255
 class STAR:
+    ROTATION = 1
     RADIUS = 15
     RADIUS_FACTOR = 1.3
     COLOR = [255,255,255]
@@ -33,8 +34,13 @@ class STAR:
         TICK = 30
         SPEED = 0.2
         REG_FACTOR = (1 - 1 / (SPEED * TICK + 1))
-class MOUSE:
+class PICTURE:
+    ALPHA_DECAY = 3
+    MAX_ALPHA = 255
+class CONTROLLER:
     COLOR = [255,255,255]
+    HOVER_DISTANCE_SQ = 836.66
+    ROTATE_TICK = 20
 class AUTOPLAY:
     ENABLE = False
     SCROLL_BG_FACTOR = 0.2
@@ -46,10 +52,12 @@ class AUTOPLAY:
         TICK = None
         SPEED = 0.1
         REG_FACTOR = None
+class HANDLER:
+    SPEED_CONTROL_FACTOR = 0.95
 class METEOR:
     ENABLE = True
     LENGTH = [300,600]
-    ANGLE = [30,60]
+    DIRECTION = [30,60]
     FROMY_FACTOR = 0.3
     STAY_TICK = 120    # >=slide_tick
     SLIDE_TICK = 90

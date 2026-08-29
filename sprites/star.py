@@ -1,7 +1,7 @@
 import pygame
 from lib import *
 from random import randint,choice
-from settings import *
+from properties import *
 class Star(pygame.sprite.Sprite):
     hovertick = 0
     hovering = False

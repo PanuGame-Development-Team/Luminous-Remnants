@@ -1,0 +1,3 @@
+from ca import *
+class Renderer(Interface):
+    def render(self,object) -> None:...

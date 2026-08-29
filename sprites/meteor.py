@@ -1,6 +1,6 @@
 import pygame
 from lib import *
-from settings import *
+from properties import *
 from random import randint,choice,random
 from init import screensize
 from math import cos,sin,pi

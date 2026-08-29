@@ -2,11 +2,11 @@ import pickle,json
 from settings import *
 import pygame
 pygame.init()
-with open("logo.pdb","wb") as file:
+with open("logo.dat","wb") as file:
     dic = {"logo.png":open("resources/logo.png","rb").read(),
            "logo2.png":open("resources/logo2.png","rb").read()}
     pickle.dump(dic,file)
-with open("main.pdb","wb") as file:
+with open("main.lrg","wb") as file:
     dic = {"VERSION":CONSTANTS.PACKVER}
     print("正在打包:  " + "font.ttf")
     dic["font.ttf"] = open("resources/font.ttf","rb").read()

@@ -1,75 +1,80 @@
-import pygame
-from init import *
-import os
+from entity import settings as eset
+from usecase import settings as uset
+from adapter import settings as aset
 from settings import *
-from sprites.mouse import Mouse
-from sprites.meteor import MeteorRainHandler
-from lib import *
+eset.DEBUG = DEBUG
+eset.STAR = STAR
+uset.PICTURE = PICTURE
+uset.STAR = STAR
+uset.METEOR = METEOR
+aset.CONTROLLER = CONTROLLER
+aset.HANDLER = HANDLER
+aset.CONSTANTS = CONSTANTS
+# aset.CONTROLLER = CONTROLLER
+aset.GALAXY = GALAXY
+aset.GENERAL = GENERAL
+# aset.HANDLER = HANDLER
+aset.STAR = STAR
+
+from init import loadall
+from adapter.pygame.data_provider_pickle import Pickle
+from adapter.pygame.renderer.renderer_controller import ControllerRenderer
+from adapter.pygame.renderer.renderer_picture import PictureRenderer
+from adapter.pygame.renderer.renderer_star import StarRenderer
+from adapter.pygame.renderer.renderer_galaxy import GalaxyRenderer
+from adapter.pygame.renderer.renderer_meteor import MeteorRenderer,MeteorRainProcesser
+from adapter.pygame.handler_mousekbd import MouseKBD
+from adapter.controller import Controller
+from usecase.usecase import UseCase
+from adapter.pygame.events import *
+import pygame
+pygame.init()
+screen = pygame.display.set_mode([1280,720] if DEBUG.WINDOW else [0,0],pygame.FULLSCREEN if not DEBUG.WINDOW else 0)
+clock = pygame.time.Clock()
+screensize = screen.get_size()
+pygame.mouse.set_visible(False)
+dataprovider = Pickle(screensize,"main.lrg")
+footnotes = [CONSTANTS.VERSION,CONSTANTS.APP_NAME]
 if AUTOPLAY.ENABLE:
-    from time import time
-    t0 = time()
-    dest = [0,-1]
-    find_next(dest,galaxy)
-speed = 0
-leftbuttondown = rightbuttondown = False
-showing = False
-select = False
-showing = False
-bgm.play(-1)
-mouse = Mouse()
-if METEOR.ENABLE:
-    meteor = pygame.sprite.Group()
-    mrhandler = MeteorRainHandler()
+    footnotes.append("AUTOPLAY")
+if not METEOR.ENABLE:
+    footnotes.append("NO METEOR")
+if not loadall(screen,dataprovider,clock,footnotes):
+    quit(0)
+controller = Controller(UseCase.Entity.Pos(*pygame.mouse.get_pos(),*screensize),[i[1] for i in dataprovider.resource("galaxy").items()],screensize)
+handler = MouseKBD(controller)
+pr = PictureRenderer(screen,screensize)
+sr = StarRenderer(screen,screensize)
+gr = GalaxyRenderer(screen,screensize,controller,dataprovider.resource("namefont"),sr)
+cr = ControllerRenderer(screen,screensize,pr)
+mr = MeteorRenderer(screen,screensize)
+meteorls = []
+rain_processer = MeteorRainProcesser(screensize)
+keepgoing = True
 while keepgoing:
+    handler.emit(Tick(None))
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
+            handler.emit(KeyDown(event.key))
             if event.key == pygame.K_ESCAPE:
                 keepgoing = False
-            elif event.key == pygame.K_LEFT:
-                leftbuttondown = True
-            elif event.key == pygame.K_RIGHT:
-                rightbuttondown = True
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
-                leftbuttondown = False
-            elif event.key == pygame.K_RIGHT:
-                rightbuttondown = False
+            handler.emit(KeyUp(event.key))
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if not AUTOPLAY.ENABLE:
-                mouse.click()
-    if not AUTOPLAY.ENABLE:
-        if not mouse.showing:
-            speed += leftbuttondown
-            speed -= rightbuttondown
-        speed = round(speed * GENERAL.SPEED_DACAY,5)
-    else:
-        speed = scroller.speed()
-        if time() - t0 > sched[0][0]:
-            if sched[0][1] == "click":
-                mouse.click()
-            elif sched[0][1] == "quit":
-                keepgoing = False
-            elif sched[0][1] == "move":
-                mouse.autoplay.dest = galaxy.sprites()[dest[0]].stars.sprites()[dest[1]].pos
-                mouse.autoplay.outset = mouse.pos
-                mouse.autoplay.moving = True
-                find_next(dest,galaxy)
-            elif sched[0][1] == "checkbg":
-                gal = galaxy.sprites()[dest[0]]
-                if gal.right > screensize[0] * (1 - AUTOPLAY.SCROLL_BG_FACTOR):
-                    scroller.scroll(gal.left - screensize[0] * AUTOPLAY.SCROLL_BG_FACTOR)
-                if gal.right < 0:
-                    scroller.scroll(gal.left - screensize[0] * (AUTOPLAY.SCROLL_BG_FACTOR - 2))
-            sched.pop(0)
+            handler.emit(MouseDown(screensize))
+        elif event.type == pygame.MOUSEMOTION:
+            handler.emit(MouseMove(screensize))
     screen.fill(GENERAL.BG_COLOR)
-    galaxy.update(screen,speed,mouse,mouse.alpha)
-    if METEOR.ENABLE:
-        mrhandler.handle(meteor)
-        meteor.update(screen,speed,mouse.alpha)
-    mouse.update(screen,pygame.mouse.get_pos())
+    for galaxyname in dataprovider.resource("galaxy"):
+        dataprovider.resource("galaxy")[galaxyname].get().tick()
+    for meteor in meteorls:
+        meteor.tick()
+    rain_processer.handle(meteorls)
+    for galaxyname in dataprovider.resource("galaxy"):
+        gr.render(dataprovider.resource("galaxy")[galaxyname].get())
+    for meteor in meteorls:
+        mr.render(meteor)
+    cr.render(controller)
     pygame.display.update()
     clock.tick(CONSTANTS.TICK_SPEED)
 pygame.quit()
-for filename in os.listdir("temp"):
-    os.remove("temp/" + filename)
-os.rmdir("temp")
