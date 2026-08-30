@@ -27,11 +27,11 @@ class MeteorRenderer(UseCase.Renderer):
         if object.living_tick >= METEOR.STAY_TICK:
             start = tpos
         else:
-            start = section_formula(*fpos,*tpos,sine_approaching(object.living_tick,METEOR.STAY_TICK,1))
+            start = section_formula(*fpos,*tpos,sine_slide(object.living_tick,METEOR.STAY_TICK,1))
         if object.living_tick <= METEOR.SLIDE_TICK:
             end = fpos
         else:
-            end = section_formula(*fpos,*tpos,sine_approaching(object.living_tick - METEOR.SLIDE_TICK,METEOR.STAY_TICK,1))
+            end = section_formula(*fpos,*tpos,sine_slide(object.living_tick - METEOR.SLIDE_TICK,METEOR.STAY_TICK,1))
         color = color_adapt(METEOR.COLOR,GENERAL.BG_COLOR,UseCase.var.alpha,METEOR.SHOW_FACTOR,0)
         if UseCase.Entity.Pos(*start) - UseCase.Entity.Pos(*end) > (METEOR.FRONT_COVER_RADIUS + METEOR.BACK_COVER_RADIUS) ** 2:
             linestart = circle_border(METEOR.FRONT_COVER_RADIUS,*start,*end)

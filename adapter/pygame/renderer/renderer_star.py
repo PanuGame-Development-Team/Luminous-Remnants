@@ -26,12 +26,12 @@ class StarRenderer(UseCase.Renderer):
                 pygame.draw.circle(self.display,color,center,r * STAR.RADIUS_FACTOR,1)
     def hoverR(self,object:UseCase.Star):
         if object.hovering:
-            if object.hovertick < STAR.HOVER.TICK:
+            if object.hovertick < STAR.HOVER_TICK:
                 object.hovertick += 1
-                return approaching(object.hovertick,object.rmin,object.rmax,STAR.HOVER) + object.rmin
+                return approaching(object.hovertick,STAR.HOVER_TICK,object.rmin,object.rmax) + object.rmin
             return object.rmax
         else:
-            if object.hovertick < STAR.HOVER.TICK:
+            if object.hovertick < STAR.HOVER_TICK:
                 object.hovertick += 1
-                return object.rmax - approaching(object.hovertick,object.rmin,object.rmax,STAR.HOVER)
+                return object.rmax - approaching(object.hovertick,STAR.HOVER_TICK,object.rmin,object.rmax)
             return object.rmin

@@ -12,7 +12,7 @@ class Star(Entity.Star):
             self.direction -= 360
         elif self.direction < 0:
             self.direction += 360
-        if self.hovertick < STAR.HOVER.TICK:
+        if self.hovertick < STAR.HOVER_TICK:
             self.hovertick += 1
         if not self.locked:
             self.pic.tick()

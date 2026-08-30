@@ -4,7 +4,7 @@ from usecase.lib import Event as _Event
 from usecase.controller import Controller as _Controller
 from usecase.dataprovider import DataProvider as _DataProvider
 from usecase.galaxy import Galaxy as _Galaxy
-from usecase.handler import Handler as _Handler
+from usecase.handler import Handler as _Handler,StopPlaying as _StopPlaying
 from usecase.meteor import Meteor as _Meteor
 from usecase.picture import Picture as _Picture
 from usecase.renderer import Renderer as _Renderer
@@ -22,3 +22,4 @@ class UseCase(Layer):
     Renderer = _Renderer
     Star = _Star
     Entity = _Entity
+    StopPlaying = _StopPlaying

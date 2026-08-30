@@ -1,6 +1,5 @@
 from ca import *
 from entity.entity import Entity
-from usecase.galaxy import Galaxy
 class Controller(Interface):
     showing = False
     def __init__(self,pos:Entity.Pos):

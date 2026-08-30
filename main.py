@@ -24,6 +24,7 @@ from adapter.pygame.renderer.renderer_star import StarRenderer
 from adapter.pygame.renderer.renderer_galaxy import GalaxyRenderer
 from adapter.pygame.renderer.renderer_meteor import MeteorRenderer,MeteorRainProcesser
 from adapter.pygame.handler_mousekbd import MouseKBD
+from adapter.pygame.handler_autoplay import Autoplay
 from adapter.controller import Controller
 from usecase.usecase import UseCase
 from adapter.pygame.events import *
@@ -35,14 +36,21 @@ screensize = screen.get_size()
 pygame.mouse.set_visible(False)
 dataprovider = Pickle(screensize,"main.lrg")
 footnotes = [CONSTANTS.VERSION,CONSTANTS.APP_NAME]
-if AUTOPLAY.ENABLE:
+if HANDLER.AUTOPLAY.ENABLE:
     footnotes.append("AUTOPLAY")
 if not METEOR.ENABLE:
     footnotes.append("NO METEOR")
 if not loadall(screen,dataprovider,clock,footnotes):
     quit(0)
-controller = Controller(UseCase.Entity.Pos(*pygame.mouse.get_pos(),*screensize),[i[1] for i in dataprovider.resource("galaxy").items()],screensize)
-handler = MouseKBD(controller)
+galaxyls = [i[1] for i in dataprovider.resource("galaxy").items()]
+if not HANDLER.AUTOPLAY.ENABLE:
+    controller = Controller(UseCase.Entity.Pos(*pygame.mouse.get_pos(),*screensize),galaxyls,screensize)
+    handler = MouseKBD(controller)
+    bgm = dataprovider.resource("bgm")[0].get().play(-1)
+else:
+    controller = Controller(UseCase.Entity.Pos(screensize[0] / 2,screensize[1] / 2,*screensize),galaxyls,screensize)
+    handler = Autoplay(controller,list(zip(dataprovider.path["bgm"],dataprovider.resource("bgm"))),galaxyls,screensize)
+    pygame.mixer.music.play(-1)
 pr = PictureRenderer(screen,screensize)
 sr = StarRenderer(screen,screensize)
 gr = GalaxyRenderer(screen,screensize,controller,dataprovider.resource("namefont"),sr)
@@ -52,18 +60,22 @@ meteorls = []
 rain_processer = MeteorRainProcesser(screensize)
 keepgoing = True
 while keepgoing:
-    handler.emit(Tick(None))
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            handler.emit(KeyDown(event.key))
-            if event.key == pygame.K_ESCAPE:
-                keepgoing = False
-        elif event.type == pygame.KEYUP:
-            handler.emit(KeyUp(event.key))
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            handler.emit(MouseDown(screensize))
-        elif event.type == pygame.MOUSEMOTION:
-            handler.emit(MouseMove(screensize))
+    try:
+        handler.emit(Tick(None))
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                handler.emit(KeyDown(event.key))
+                if event.key == pygame.K_ESCAPE:
+                    keepgoing = False
+            elif event.type == pygame.KEYUP:
+                handler.emit(KeyUp(event.key))
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                print(controller.pos.t())
+                handler.emit(MouseDown(screensize))
+            elif event.type == pygame.MOUSEMOTION:
+                handler.emit(MouseMove(screensize))
+    except UseCase.StopPlaying:
+        keepgoing = False
     screen.fill(GENERAL.BG_COLOR)
     for galaxyname in dataprovider.resource("galaxy"):
         dataprovider.resource("galaxy")[galaxyname].get().tick()

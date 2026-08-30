@@ -11,9 +11,12 @@ with open("main.lrg","wb") as file:
     print("正在打包:  " + "font.ttf")
     dic["font.ttf"] = open("resources/font.ttf","rb").read()
     print("正在打包:  " + "bg.ogg")
-    dic["bg.ogg"] = open("resources/bg.ogg","rb").read()
-    print("正在打包:  " + "bg2.ogg")
-    dic["bg2.ogg"] = open("resources/bg2.ogg","rb").read()
+    dic["bg.ogg"] = [open("resources/bg.ogg","rb").read()]
+    i = 2
+    while isfile(f"resources/bg{i}.ogg"):
+        print("正在打包:  " + f"bg{i}.ogg")
+        dic["bg.ogg"].append(open(f"resources/bg{i}.ogg","rb").read())
+        i += 1
     with open("resources/星座/galaxy.json",encoding="UTF-8") as f:
         print("正在打包:  " + "星座/galaxy.json")
         dic["星座/galaxy.json"] = json.loads(f.read())

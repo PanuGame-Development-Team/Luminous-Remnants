@@ -29,7 +29,9 @@ class Controller(UseCase.Controller):
                 for star in galaxy.stars:
                     if star.locked:
                         continue
-                    distance = star.pos - self.pos
+                    lpos = UseCase.Entity.Pos(star.pos.x - GENERAL.GRAPH_WIDTH * self.screensize[0],star.pos.y,*self.screensize)
+                    rpos = UseCase.Entity.Pos(star.pos.x + GENERAL.GRAPH_WIDTH * self.screensize[0],star.pos.y,*self.screensize)
+                    distance = min(star.pos - self.pos,rpos - self.pos,lpos - self.pos)
                     if distance < min(CONTROLLER.HOVER_DISTANCE_SQ,mdissq):
                         mstar = star
                         mdissq = distance

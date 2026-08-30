@@ -2,7 +2,7 @@ from os.path import isfile
 from json import loads
 class CONSTANTS:
     APP_NAME = "Luminous-Remnants"
-    VERSION = "1.3.0-260210-stable"
+    VERSION = "2.0.0-260829-alpha"
     PACKVER = "1.2-rev1"
     INITIAL_SCRSIZE = [1536,864]
     TICK_SPEED = 60
@@ -30,10 +30,7 @@ class STAR:
     COLOR = [255,255,255]
     LOCKED_COLOR = [128,128,128]
     SHOW_FACTOR = 360
-    class HOVER:
-        TICK = 30
-        SPEED = 0.2
-        REG_FACTOR = (1 - 1 / (SPEED * TICK + 1))
+    HOVER_TICK = 30
 class PICTURE:
     ALPHA_DECAY = 3
     MAX_ALPHA = 255
@@ -41,19 +38,16 @@ class CONTROLLER:
     COLOR = [255,255,255]
     HOVER_DISTANCE_SQ = 836.66
     ROTATE_TICK = 20
-class AUTOPLAY:
-    ENABLE = False
-    SCROLL_BG_FACTOR = 0.2
-    class TIME:
-        MOVEMOUSE = 1
-        FADE = 1.5
-        CACHE = 0.5
-    class MOUSE:
-        TICK = None
-        SPEED = 0.1
-        REG_FACTOR = None
 class HANDLER:
     SPEED_CONTROL_FACTOR = 0.95
+    class AUTOPLAY:
+        MAX_LOOP = 5
+        ENABLE = False
+        SCROLL_BG_FACTOR = 0.2
+        class TIME:
+            MOVEMOUSE = 1
+            FADE = 1.5
+            CACHE = 1
 class METEOR:
     ENABLE = True
     LENGTH = [300,600]
@@ -81,7 +75,7 @@ if isfile("properties"):
         section = "GENERAL"
         for i in file.readlines():
             line = i.strip("\n")
-            if line in ["[INIT]","[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[MOUSE]","[AUTOPLAY]","[METEOR]"]:
+            if line in ["[INIT]","[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[PICTURE]","[CONTROLLER]","[HANDLER]","[METEOR]"]:
                 section = line.replace("[","").replace("]","")
                 continue
             if not "=" in line:
@@ -102,5 +96,3 @@ if isfile("properties"):
                 setattr(variable,dest[-1],value)
             else:
                 raise ValueError("Invalid assignment statement in properties.")
-AUTOPLAY.MOUSE.TICK = (AUTOPLAY.TIME.MOVEMOUSE + AUTOPLAY.TIME.FADE - AUTOPLAY.TIME.CACHE) * CONSTANTS.TICK_SPEED
-AUTOPLAY.MOUSE.REG_FACTOR = (1 - 1 / (AUTOPLAY.MOUSE.SPEED * AUTOPLAY.MOUSE.TICK + 1))

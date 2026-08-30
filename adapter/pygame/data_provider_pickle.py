@@ -21,6 +21,7 @@ class Pickle(UseCase.DataProvider):
         self.filename = filename
     res = {}
     startot = 0
+    path = {}
     def load_logo(self):
         if not isfile("logo.dat"):
             raise FileNotFoundError("logo.dat")
@@ -37,8 +38,13 @@ class Pickle(UseCase.DataProvider):
             dic = self.dic = load(file)
         if dic.get("VERSION") != CONSTANTS.PACKVER:
             raise RuntimeError("Package version incompatible. Expected %s, received %s"%(CONSTANTS.PACKVER,dic.get("VERSION")))
-        self.res["namefont"] = self.datrman.register(pygame.font.Font(savdat("ttf",dic["font.ttf"]),GALAXY.LABEL_DISPSIZE))
-        self.res["bgm"] = self.datrman.register(pygame.mixer.Sound(savdat("ogg",dic["bg.ogg"])))
+        self.path["namefont"] = savdat("ttf",dic["font.ttf"])
+        self.res["namefont"] = self.datrman.register(pygame.font.Font(self.path["namefont"],GALAXY.LABEL_DISPSIZE))
+        self.path["bgm"] = []
+        self.res["bgm"] = []
+        for i in dic["bg.ogg"]:
+            self.path["bgm"].append(savdat("ogg",i))
+            self.res["bgm"].append(self.datrman.register(pygame.mixer.Sound(self.path["bgm"][-1])))
         self.res["galaxy"] = {}
         for galaxyname in dic["星座/galaxy.json"]:
             stars = []
