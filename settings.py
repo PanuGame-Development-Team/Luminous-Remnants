@@ -2,9 +2,8 @@ from os.path import isfile
 from json import loads
 class CONSTANTS:
     APP_NAME = "Luminous-Remnants"
-    VERSION = "2.0.0-260829-alpha"
+    VERSION = "2.0.1-260901-beta"
     PACKVER = "1.2-rev1"
-    INITIAL_SCRSIZE = [1536,864]
     TICK_SPEED = 60
 class INIT:
     DEFAULT_FONT = ["firacode","couriernew","consolas","monaco","monospace"]
@@ -17,6 +16,7 @@ class GENERAL:
     BG_COLOR = [0,0,30]
     GRAPH_WIDTH = 2
     VISIBLE_DISTANCE = 836.66
+    INITIAL_SCRSIZE = [1536,864]
 class GALAXY:
     LINE_COLOR = [255,255,255]
     LINE_SHOW_FACTOR = 360

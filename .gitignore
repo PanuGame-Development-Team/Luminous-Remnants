@@ -14,3 +14,4 @@ __pycache__/
 /main.onefile-build/
 /main.bin
 .vscode/
+/resources/

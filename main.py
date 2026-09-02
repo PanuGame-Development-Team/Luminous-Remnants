@@ -53,7 +53,7 @@ else:
     pygame.mixer.music.play(-1)
 pr = PictureRenderer(screen,screensize)
 sr = StarRenderer(screen,screensize)
-gr = GalaxyRenderer(screen,screensize,controller,dataprovider.resource("namefont"),sr)
+gr = GalaxyRenderer(screen,screensize,controller,dataprovider.resource("namefont"),dataprovider.resource("labelfont") if dataprovider.resource("labelfont") else dataprovider.resource("namefont"),sr)
 cr = ControllerRenderer(screen,screensize,pr)
 mr = MeteorRenderer(screen,screensize)
 meteorls = []
@@ -70,7 +70,6 @@ while keepgoing:
             elif event.type == pygame.KEYUP:
                 handler.emit(KeyUp(event.key))
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(controller.pos.t())
                 handler.emit(MouseDown(screensize))
             elif event.type == pygame.MOUSEMOTION:
                 handler.emit(MouseMove(screensize))

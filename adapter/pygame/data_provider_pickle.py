@@ -48,7 +48,7 @@ class Pickle(UseCase.DataProvider):
         self.res["galaxy"] = {}
         for galaxyname in dic["星座/galaxy.json"]:
             stars = []
-            formatted = [[UseCase.Entity.Pos(*stardat["pos"],*CONSTANTS.INITIAL_SCRSIZE).scale(*self.screensize),stardat["star"]] for stardat in dic["星座/galaxy.json"][galaxyname]]
+            formatted = [[UseCase.Entity.Pos(*stardat["pos"],*GENERAL.INITIAL_SCRSIZE).scale(*self.screensize),stardat["star"]] for stardat in dic["星座/galaxy.json"][galaxyname]]
             starcnt = 0
             for stardat in formatted:
                 if stardat[1]:
@@ -64,4 +64,4 @@ class Pickle(UseCase.DataProvider):
     def tick(self):
         return self.datrman
     def resource(self,name:str):
-        return self.res[name]
+        return self.res.get(name)

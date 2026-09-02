@@ -4,12 +4,12 @@ from adapter.pygame.renderer.uimath import *
 from adapter.pygame.renderer.renderer_star import StarRenderer
 import pygame
 class GalaxyRenderer(UseCase.Renderer):
-    def __init__(self,display:pygame.surface.Surface,scrsize,controller:UseCase.Controller,namefont:UseCase.Entity.Resource_id,sr:StarRenderer):
+    def __init__(self,display:pygame.surface.Surface,scrsize,controller:UseCase.Controller,namefont:UseCase.Entity.Resource_id,labelfont:UseCase.Entity.Resource_id,sr:StarRenderer):
         self.display = display
         self.scrsize = scrsize
         self.controller = controller
         self.namefont = namefont
-        self.labelfont = ...
+        self.labelfont = labelfont
         self.sr = sr
     def render(self,object:UseCase.Galaxy):
         left = (object.left + UseCase.var.scroffset) % (GENERAL.GRAPH_WIDTH * self.scrsize[0])
@@ -30,9 +30,10 @@ class GalaxyRenderer(UseCase.Renderer):
         if not object.label:
             self.display.blit(galnamesurf,centrialize(*center,*galnamesurf.get_size(),0,0))
         else:
-            # labelsurf = self.labelfont.get().render(object.label,1,fontcolor)
+            labelsurf = self.labelfont.get().render(object.label,1,fontcolor)
+            scaled = pygame.transform.smoothscale_by(labelsurf,min(2 * object.r / labelsurf.get_width(),1))
             self.display.blit(galnamesurf,centrialize(*center,*galnamesurf.get_size(),0,-GALAXY.LABEL_DISPSIZE/2))
-            # self.display.blit(labelsurf,centrialize(*center,*labelsurf.get_size(),0,GALAXY.LABEL_DISPSIZE/2))
+            self.display.blit(scaled,centrialize(*center,*scaled.get_size(),0,GALAXY.LABEL_DISPSIZE/2))
         pygame.draw.aalines(self.display,linecolor,False,[(t[0] + right - object.right,t[1]) for t in [i.t() for i in object.lines]])
         for star in object.stars:
             self.sr.render(star)
