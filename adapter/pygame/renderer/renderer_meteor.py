@@ -63,14 +63,14 @@ class MeteorRainProcesser:
             self.drop(group)
         else:
             self.count.append(0)
-        if self.tick > METEOR.RAIN.STAY_TICK:
+        if self.tick > METEOR.RAIN.SPACING_TICK:
             self.total -= self.count.pop(0)
             if self.total < METEOR.RAIN.METEOR_LIMIT:
-                self.angle = randlr(*METEOR.DIRECTION) / 180 * math.pi
+                self.angle = randlr(METEOR.MIN_DIRECTION,METEOR.MAX_DIRECTION) / 180 * math.pi
                 self.lr = choice([-1,1])
                 self.raining = True
                 self.rain_tick = 0
-                self.total = METEOR.RAIN.STAY_TICK
+                self.total = METEOR.RAIN.SPACING_TICK
                 self.count = [1 for i in range(METEOR.RAIN.STAY_TICK)]
     def handle_rain(self,group:list):
         if self.rain_tick < METEOR.RAIN.DURATION:
@@ -82,9 +82,9 @@ class MeteorRainProcesser:
     def drop(self,group:list,angle=None,lr=None):
         fromx = randlr(-self.screensize[0],self.screensize[0] * 2)
         fromy = randlr(0,self.screensize[1] * METEOR.FROMY_FACTOR)
-        length = randlr(*METEOR.LENGTH)
+        length = randlr(METEOR.MIN_LENGTH,METEOR.MAX_LENGTH)
         if not angle:
-            angle = randlr(*METEOR.DIRECTION) / 180 * math.pi
+            angle = randlr(METEOR.MIN_DIRECTION,METEOR.MAX_DIRECTION) / 180 * math.pi
         if not lr:
             lr = choice([-1,1])
         tox = fromx + lr * length * math.cos(angle)

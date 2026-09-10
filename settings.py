@@ -24,15 +24,15 @@ class GALAXY:
     LABEL_COLOR = [109,158,235]
     LABEL_SHOW_FACTOR = 255
 class STAR:
-    ROTATION = 1
-    RADIUS = 15
+    ROTATION = 1.0
+    RADIUS = 15.0
     RADIUS_FACTOR = 1.3
     COLOR = [255,255,255]
     LOCKED_COLOR = [128,128,128]
     SHOW_FACTOR = 360
     HOVER_TICK = 30
 class PICTURE:
-    ALPHA_DECAY = 3
+    ALPHA_DECAY = 3.0
     MAX_ALPHA = 255
 class CONTROLLER:
     COLOR = [255,255,255]
@@ -45,36 +45,40 @@ class HANDLER:
         ENABLE = False
         SCROLL_BG_FACTOR = 0.2
         class TIME:
-            MOVEMOUSE = 1
+            MOVEMOUSE = 1.0
             FADE = 1.5
-            CACHE = 1
+            CACHE = 1.0
 class METEOR:
     ENABLE = True
-    LENGTH = [300,600]
-    DIRECTION = [30,60]
-    FROMY_FACTOR = 0.3
+    MIN_LENGTH = 300
+    MAX_LENGTH = 600
+    MIN_DIRECTION = 30
+    MAX_DIRECTION = 60
+    FROMY_FACTOR = 0.5
     STAY_TICK = 120    # >=slide_tick
     SLIDE_TICK = 90
     COLOR = [255,255,255]
     SHOW_FACTOR = 360
-    FRONT_STAR_RADIUS = 15
-    BACK_STAR_RADIUS = 12
-    ROTATION = 3
-    FRONT_COVER_RADIUS = 20
-    BACK_COVER_RADIUS = 16
+    FRONT_STAR_RADIUS = 15.0
+    BACK_STAR_RADIUS = 12.0
+    ROTATION = 3.0
+    FRONT_COVER_RADIUS = 20.0
+    BACK_COVER_RADIUS = 16.0
     class RAIN:
         MIN_PROBABILITY = 0.01
         MAX_PROBABILITY = 0.05
         PROBABILITY_PERIOD = 600
-        STAY_TICK = 480
+        SPACING_TICK = 480
         METEOR_LIMIT = 8
-        DURATION = 600
+        DURATION = 1200
         TICK_PER_MET = 6
 if isfile("properties"):
     with open("properties") as file:
         section = "GENERAL"
         for i in file.readlines():
             line = i.strip("\n")
+            if not line:
+                continue
             if line in ["[INIT]","[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[PICTURE]","[CONTROLLER]","[HANDLER]","[METEOR]"]:
                 section = line.replace("[","").replace("]","")
                 continue

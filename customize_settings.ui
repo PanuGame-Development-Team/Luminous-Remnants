@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Luminous-Remnants Graph-Editor</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tab">
+      <property name="currentIndex">
+       <number>8</number>
+      </property>
+      <widget class="QWidget" name="general">
+       <attribute name="title">
+        <string>GENERAL</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="init">
+       <attribute name="title">
+        <string>INIT</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="debug">
+       <attribute name="title">
+        <string>DEBUG</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="galaxy">
+       <attribute name="title">
+        <string>GALAXY</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="star">
+       <attribute name="title">
+        <string>STAR</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="picture">
+       <attribute name="title">
+        <string>PICTURE</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="controller">
+       <attribute name="title">
+        <string>CONTROLLER</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="handler">
+       <attribute name="title">
+        <string>HANDLER</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="meteor">
+       <attribute name="title">
+        <string>METEOR</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
