@@ -3,7 +3,7 @@ from json import loads
 class CONSTANTS:
     APP_NAME = "Luminous-Remnants"
     VERSION = "2.0.1-260901-beta"
-    PACKVER = "1.2-rev1"
+    PACKVER = "2.0.1"
     TICK_SPEED = 60
 class INIT:
     DEFAULT_FONT = ["firacode","couriernew","consolas","monaco","monospace"]

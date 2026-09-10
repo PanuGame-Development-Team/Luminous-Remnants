@@ -71,7 +71,7 @@ class MeteorRainProcesser:
                 self.raining = True
                 self.rain_tick = 0
                 self.total = METEOR.RAIN.SPACING_TICK
-                self.count = [1 for i in range(METEOR.RAIN.STAY_TICK)]
+                self.count = [1 for i in range(METEOR.RAIN.SPACING_TICK)]
     def handle_rain(self,group:list):
         if self.rain_tick < METEOR.RAIN.DURATION:
             if self.rain_tick % METEOR.RAIN.TICK_PER_MET == 0:

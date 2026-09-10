@@ -3,7 +3,7 @@ from entity.star import Star
 from entity.lib import Pos,average
 from settings import STAR
 class Galaxy(Interface):
-    def __init__(self,name:str,label:str,stars:list[Star],lines:list[Pos]):
+    def __init__(self,name:str,label:str,stars:list[Star],lines:list[list[Pos]]):
         self.label = label
         self.name = name
         self.stars = stars

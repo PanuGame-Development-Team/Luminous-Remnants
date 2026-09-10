@@ -17,12 +17,12 @@ with open("main.lrg","wb") as file:
         print("正在打包:  " + f"bg{i}.ogg")
         dic["bg.ogg"].append(open(f"resources/bg{i}.ogg","rb").read())
         i += 1
-    with open("resources/星座/galaxy.json",encoding="UTF-8") as f:
-        print("正在打包:  " + "星座/galaxy.json")
+    with open("resources/星座/galaxy_2.0.1.json",encoding="UTF-8") as f:
+        print("正在打包:  " + "星座/galaxy_2.0.1.json")
         dic["星座/galaxy.json"] = json.loads(f.read())
     for galaxyname in dic["星座/galaxy.json"]:
         starcnt = 0
-        for stardat in dic["星座/galaxy.json"][galaxyname]:
+        for stardat in dic["星座/galaxy.json"][galaxyname][:-1]:
             if stardat["star"]:
                 starcnt += 1
                 try:

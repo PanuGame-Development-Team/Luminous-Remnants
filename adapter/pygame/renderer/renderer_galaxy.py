@@ -34,6 +34,11 @@ class GalaxyRenderer(UseCase.Renderer):
             scaled = pygame.transform.smoothscale_by(labelsurf,min(2 * object.r / labelsurf.get_width(),1))
             self.display.blit(galnamesurf,centrialize(*center,*galnamesurf.get_size(),0,-GALAXY.LABEL_DISPSIZE/2))
             self.display.blit(scaled,centrialize(*center,*scaled.get_size(),0,GALAXY.LABEL_DISPSIZE/2))
-        pygame.draw.aalines(self.display,linecolor,False,[(t[0] + right - object.right,t[1]) for t in [i.t() for i in object.lines]])
+        for i in object.lines:
+            start = list(i[0].t())
+            end = list(i[1].t())
+            start[0] += right - object.right
+            end[0] += right - object.right
+            pygame.draw.aaline(self.display,linecolor,start,end)
         for star in object.stars:
             self.sr.render(star)
