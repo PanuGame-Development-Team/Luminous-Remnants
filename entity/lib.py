@@ -33,6 +33,8 @@ class Pos(DataStructure):
         return self.x,self.y
     def d(self,other) -> float:
         return sqrt(self - other)
+    def copy(self):
+        return type(self)(self.x,self.y,self.stx,self.sty)
 class Resource_id(DataStructure):
     def __init__(self,id:str):
         self.id = id

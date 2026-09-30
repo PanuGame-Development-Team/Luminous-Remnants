@@ -15,7 +15,7 @@ class StarRenderer(UseCase.Renderer):
             return
         if object.locked:
             color = color_adapt(STAR.LOCKED_COLOR,GENERAL.BG_COLOR,UseCase.var.alpha,STAR.SHOW_FACTOR,0)
-            pygame.draw.aalines(self.display,color,1,starposls(5,STAR.RADIUS,0,*center))
+            pygame.draw.aalines(self.display,color,1,starposls(5,STAR.RADIUS,object.direction,*center))
         else:
             color = color_adapt(STAR.COLOR,GENERAL.BG_COLOR,UseCase.var.alpha,STAR.SHOW_FACTOR,0)
             object.r = r = self.hoverR(object)
@@ -28,7 +28,7 @@ class StarRenderer(UseCase.Renderer):
         if object.hovering:
             if object.hovertick < STAR.HOVER_TICK:
                 object.hovertick += 1
-                return approaching(object.hovertick,STAR.HOVER_TICK,object.rmin,object.rmax) + object.rmin
+                return approaching(object.hovertick,STAR.HOVER_TICK,object.rmin,object.rmax)
             return object.rmax
         else:
             if object.hovertick < STAR.HOVER_TICK:

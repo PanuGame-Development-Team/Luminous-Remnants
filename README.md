@@ -19,12 +19,13 @@
 ### 注意事项
 尽管提交 `73a817f` 之前并没有添加 `LICENSE` 文件，但是作者再此声明，从前的提交也按照现在的协议处理。
 
-`customize_settings.py` 中可设置的范围极其广阔，有些极端数值可能导致 `AUTOPLAY` 等精细功能失效，请仅在原设置基础上微调。
+`customize_settings.py` 中可设置的范围极其广阔（仍有边界），有些极端数值可能导致 `AUTOPLAY` 等精细功能失效，请仅在原设置基础上微调。这不是代码实现有困难，而是遵循用户控制一切的理念。
+
+`graph_editor.py` 中允许设置非法星座（没有一颗星可以被点击，只需要移出右边界的两倍即可），不做修正，正常使用时请自行注意（不确定有什么功能，但是插件系统有可能需要）。
 
 ### TODO List
 1. graph_editor 星图编辑器（定制自己的星图）
-2. PySide Renderer Qt渲染器，与pygame并行开发。
-3. Lumin Mod System 添加插件系统，在渲染，移动等多出注入钩子，采用eventbus，并且允许覆写多个接口
-4. CuteWebLumin 创建并行项目，添加占位WebSocket Renderer，前端使用Emscripten Qt。迁移到手机端。（仅允许AUTOPLAY）
+2. Lumin Mod System 添加插件系统，在渲染，移动等多处注入钩子，采用eventbus，并且允许覆写多个接口
+3. CuteWebLumin 创建并行项目，添加占位WebSocket Renderer，前端使用Emscripten Qt。迁移到手机端。（仅允许AUTOPLAY）
 #### finished
 1. customize_settings 星图设置

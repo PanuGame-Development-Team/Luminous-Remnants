@@ -1,20 +1,21 @@
 from usecase.usecase import UseCase
 from adapter.pygame.events import KeyDown,KeyUp,MouseDown,MouseMove,Tick
 from adapter.settings import HANDLER
+import pygame
 class MouseKBD(UseCase.Handler):
     ldown = 0
     rdown = 0
     speed = 0
     def emit(self,event:UseCase.Event):
         if event.type == KeyDown.type:
-            if event.msg == "l":
+            if event.msg == pygame.K_LEFT:
                 self.ldown = True
-            elif event.msg == "r":
+            elif event.msg == pygame.K_RIGHT:
                 self.rdown = True
         elif event.type == KeyUp.type:
-            if event.msg == "l":
+            if event.msg == pygame.K_LEFT:
                 self.ldown = False
-            elif event.msg == "r":
+            elif event.msg == pygame.K_RIGHT:
                 self.rdown = False
         elif event.type == MouseDown.type:
             event.msg.x -= UseCase.var.scroffset

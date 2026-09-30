@@ -1,13 +1,14 @@
 from usecase.usecase import UseCase
 from adapter.settings import *
 from ca import *
-from os.path import isfile
+from os.path import isfile,isdir
+from os import mkdir
 from hashlib import md5
 from pickle import load
 from random import random,choice
 import pygame
 def savdat(name,dat,hashfunc=md5):
-    filename = "temp/" + hashfunc(name.encode()).hexdigest() + "." + name.split(".")[-1]
+    filename = "temp/" + hashfunc(dat).hexdigest() + "." + name.split(".")[-1]
     with open(filename,"wb") as file:
         file.write(dat)
     return filename
@@ -19,6 +20,8 @@ class Pickle(UseCase.DataProvider):
         super().__init__()
         self.screensize = screensize
         self.filename = filename
+        if not isdir("temp"):
+            mkdir("temp")
     res = {}
     startot = 0
     path = {}

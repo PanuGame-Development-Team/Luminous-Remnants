@@ -1,10 +1,5 @@
 from ca import *
-class STAR(Wrapper):
-    HOVER = None
-    RADIUS = None
-class PICTURE(Wrapper):
-    ALPHA_DECAY = None
-    MAX_ALPHA = None
-class METEOR(Wrapper):
-    STAY_TICK = None
-    SLIDE_TICK = None
+class STAR(Wrapper):...
+class PICTURE(Wrapper):...
+class METEOR(Wrapper):...
+class DEBUG(Wrapper):...

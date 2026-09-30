@@ -7,7 +7,8 @@ class Star(Entity.Star):
     rmax = 0
     r = 0
     def tick(self) -> None:
-        self.direction += self.rotation
+        if not self.locked:
+            self.direction += self.rotation
         if self.direction >= 360:
             self.direction -= 360
         elif self.direction < 0:
@@ -16,6 +17,8 @@ class Star(Entity.Star):
             self.hovertick += 1
         if not self.locked:
             self.pic.tick()
+        if DEBUG.STAR_RADIUS_ASSERTION:
+            assert self.r <= STAR.RADIUS
     def hover(self) -> None:
         self.hovering = True
         self.hovertick = 0
