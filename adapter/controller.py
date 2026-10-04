@@ -1,5 +1,6 @@
 from usecase.usecase import UseCase
 from adapter.settings import CONTROLLER,GENERAL,STAR
+from adapter.lib import find_nearest
 class Controller(UseCase.Controller):
     hover_star = None
     rotate_tick = 0
@@ -24,17 +25,9 @@ class Controller(UseCase.Controller):
         if not self.showing:
             mstar = None
             mdissq = 1e9
-            for p in self.galaxyls:
-                galaxy = p.get()
-                for star in galaxy.stars:
-                    if star.locked:
-                        continue
-                    lpos = UseCase.Entity.Pos(star.pos.x - GENERAL.GRAPH_WIDTH * self.screensize[0],star.pos.y,*self.screensize)
-                    rpos = UseCase.Entity.Pos(star.pos.x + GENERAL.GRAPH_WIDTH * self.screensize[0],star.pos.y,*self.screensize)
-                    distance = min(star.pos - self.pos,rpos - self.pos,lpos - self.pos)
-                    if distance < min((CONTROLLER.RADIUS + STAR.RADIUS) ** 2,mdissq):
-                        mstar = star
-                        mdissq = distance
+            mdissq,mstar = find_nearest(self.pos,sum([galaxy.get().stars for galaxy in self.galaxyls],[]),lambda x:x.pos)
+            if mdissq > (CONTROLLER.RADIUS + STAR.RADIUS) ** 2:
+                mstar = None
             if self.hover_star != mstar:
                 if self.hover_star:
                     self.hover_star.dehover()

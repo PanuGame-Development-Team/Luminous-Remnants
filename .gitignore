@@ -15,3 +15,6 @@ __pycache__/
 /main.bin
 .vscode/
 /resources/
+
+/test.json
+/TODO

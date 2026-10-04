@@ -5,6 +5,7 @@ class CONSTANTS:
     VERSION = "2.0.1-260901-beta"
     PACKVER = "2.0.1"
     TICK_SPEED = 60
+    EPSILON = 1e-6
 class INIT:
     DEFAULT_FONT = ["firacode","couriernew","consolas","monaco","monospace"]
     FOOTNOTE_FONT_SIZE = 24
@@ -73,6 +74,15 @@ class METEOR:
         METEOR_LIMIT = 8
         DURATION = 1200
         TICK_PER_MET = 6
+class NOTE:
+    ENABLE = True
+    CMD = True
+    CACHE_KEY_SIZE = 1024
+    DEFAULT_COLOR = [109,158,235]
+    ANTIALIAS = True
+    ORDER = ["","e","s","se"]
+    DEFAULT_FONT = ["firacode","couriernew","consolas","monaco","monospace"]
+    DEFAULT_FONT_SIZE = 16
 if isfile("properties"):
     with open("properties") as file:
         section = "GENERAL"

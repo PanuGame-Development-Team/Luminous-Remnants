@@ -29,18 +29,3 @@ def period_secion(val,max,min,period):
     return (math.sin(val / period * 2 * math.pi) + 1) / 2 * (max - min) + min
 def randlr(min,max):
     return random() * (max - min) + min
-def find_nearest(c_pos:Pos,objectls:list,getpos,get_id=None):
-    mdis = 1e9
-    index = None
-    for obj in objectls:
-        pos:Pos = getpos(obj)
-        lpos = Pos(pos.x - GENERAL.GRAPH_WIDTH * pos.stx,pos.y,pos.stx,pos.sty)
-        rpos = Pos(pos.x + GENERAL.GRAPH_WIDTH * pos.stx,pos.y,pos.stx,pos.sty)
-        distance = min(pos - c_pos,rpos - c_pos,lpos - c_pos)
-        if distance < mdis:
-            if get_id:
-                index = get_id(obj)
-            else:
-                index = obj
-            mdis = distance
-    return mdis,index

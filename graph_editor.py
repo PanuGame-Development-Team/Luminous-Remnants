@@ -20,16 +20,18 @@ aset.GALAXY = GALAXY
 aset.GENERAL = GENERAL
 # aset.HANDLER = HANDLER
 aset.STAR = STAR
+aset.NOTE = NOTE
 
 from init import loadall
 from json import dumps
-from adapter.pygame.data_provider_pickle import Pickle
+from adapter.pygame.data_provider_pickle import Pickle,load,cont2img
 from adapter.pygame.renderer.renderer_controller import ControllerRenderer
 from adapter.pygame.renderer.renderer_star import StarRenderer
 from adapter.pygame.renderer.renderer_galaxy import GalaxyRenderer
 from adapter.pygame.handler_mousekbd import MouseKBD
-from adapter.pygame.renderer.uimath import find_nearest
 from adapter.controller import Controller
+from adapter.lib import find_nearest
+from adapter.pygame.renderer.renderer_note_sidecmd import SideCMD
 from usecase.usecase import UseCase
 from adapter.pygame.events import *
 
@@ -135,13 +137,20 @@ class InjectedHandler(MouseKBD):
                     c_starindex = None
                     for i in range(len(starls)):
                         starpos = UseCase.Entity.Pos(*self.galaxydict[self.galaxyname][self.star_posid[self.galaxyname,i]]["pos"],*GENERAL.INITIAL_SCRSIZE).scale(*screensize)
-                        if star.pos.x == starpos.x and star.pos.y == starpos.y:
+                        if star.pos - starpos <= CONSTANTS.EPSILON ** 2:
                             starindex = i
-                        if c_star.pos.x == starpos.x and c_star.pos.y == starpos.y:
+                        if c_star.pos - starpos <= CONSTANTS.EPSILON ** 2:
                             c_starindex = i
                     if c_starindex != starindex:
-                        if c_starindex + 1 and starindex + 1:
-                            self.galaxydict[self.galaxyname][-1].append([self.star_posid[self.galaxyname,starindex],self.star_posid[self.galaxyname,c_starindex]])
+                        if c_starindex != None and starindex != None:
+                            edge = [self.star_posid[self.galaxyname,starindex],self.star_posid[self.galaxyname,c_starindex]]
+                            if edge in self.galaxydict[self.galaxyname][-1] or [edge[1],edge[0]] in self.galaxydict[self.galaxyname][-1]:
+                                try:
+                                    self.galaxydict[self.galaxyname][-1].remove(edge)
+                                except ValueError:
+                                    self.galaxydict[self.galaxyname][-1].remove([edge[1],edge[0]])
+                            else:
+                                self.galaxydict[self.galaxyname][-1].append(edge)
                         else:
                             raise ValueError("Galaxydict and handler.galaxy not synchorized.")
                 else:
@@ -175,6 +184,7 @@ class InjectedHandler(MouseKBD):
                 if self.state == 1:
                     self.galaxy.pop(self.galaxyname)
                     self.change_state(0)
+                    self.controller.set_pos(self.controller.pos)
                 if self.state == 2:
                     self.galaxydict[self.galaxyname][self.star_posid[self.galaxyname,self.starindex]]["star"] = False
                     for i in self.galaxydict[self.galaxyname][-1][:]:
@@ -207,6 +217,11 @@ class InjectedHandler(MouseKBD):
                     star.pic = None
                     star.locked = True
             UseCase.var.alpha = 0
+            note.set_note(namespace,"tip1","Left/Right: Explore graph")
+            note.set_note(namespace,"tip2","Click: Select galaxy")
+            note.set_note(namespace,"tip3","Space: Create new galaxy")
+            note.del_note(namespace,"tip4")
+            note.del_note(namespace,"tip5")
         elif to == 1:
             if not self.galaxyname in self.galaxy:
                 return
@@ -217,6 +232,11 @@ class InjectedHandler(MouseKBD):
                 star.locked = False
                 star.rotation = 1
             UseCase.var.alpha = PICTURE.MAX_ALPHA / 2
+            note.set_note(namespace,"tip1","Left/Right: Explore graph")
+            note.set_note(namespace,"tip2","Click: Select star")
+            note.set_note(namespace,"tip3","Space: Finish editing")
+            note.set_note(namespace,"tip4","Delete: Delete galaxy")
+            note.set_note(namespace,"tip5","WASD: Move galaxy")
         elif to == 2:
             for galaxy in galaxyls:
                 for i in range(len(galaxy.get().stars)):
@@ -227,6 +247,11 @@ class InjectedHandler(MouseKBD):
                     else:
                         star.locked = False
             UseCase.var.alpha = 0
+            note.set_note(namespace,"tip1","Click: Create a star or add/delete an edge")
+            note.set_note(namespace,"tip2","Delete: Delete star")
+            note.set_note(namespace,"tip3","WASD: Move star")
+            note.set_note(namespace,"tip4","Space: Finish editing")
+            note.del_note(namespace,"tip5")
         self.state = to
     def edit_star(self,starindex):
         self.starindex = starindex
@@ -238,25 +263,56 @@ class InjectedHandler(MouseKBD):
         galaxy.__init__(galaxy.name,galaxy.label,galaxy.stars,lines)
     def get_name(self):
         i = 1
-        while f"UNNAME {i}" in self.galaxy:
+        while f"UNNAMED {i}" in self.galaxy:
             i += 1
-        return f"UNNAME {i}"
+        return f"UNNAMED {i}"
+class NoneProvider(UseCase.DataProvider):
+    res = {}
+    path = {}
+    dic = {}
+    def load_logo(self):
+        if not isfile("logo.dat"):
+            raise FileNotFoundError("logo.dat")
+        with open("logo.dat","rb") as file:
+            dic = load(file)
+        self.rman = UseCase.Entity.ResourceManager()
+        logo = self.rman.register(cont2img("logo.png",dic))
+        logo2 = self.rman.register(cont2img("logo2.png",dic))
+        return logo,logo2
+    def load_data(self):
+        self.path["namefont"] = ""
+        self.res["namefont"] = self.datrman.register(pygame.font.SysFont(INIT.DEFAULT_FONT,GALAXY.LABEL_DISPSIZE))
+        self.path["bgm"] = []
+        self.res["bgm"] = []
+        self.res["galaxy"] = {}
+        self.dic["星座/galaxy.json"] = {}
+    def tick(self):
+            return self.datrman
+    def resource(self,name:str):
+        return self.res.get(name)
 import pygame
 pygame.init()
 screen = pygame.display.set_mode([1280,720] if DEBUG.WINDOW else [0,0],pygame.FULLSCREEN if not DEBUG.WINDOW else 0)
 clock = pygame.time.Clock()
 screensize = screen.get_size()
 pygame.mouse.set_visible(False)
-dataprovider = Pickle(screensize,"main.lrg")
+if isfile("main.lrg"):
+    dataprovider = Pickle(screensize,"main.lrg")
+else:
+    dataprovider = NoneProvider()
 footnotes = [CONSTANTS.VERSION,CONSTANTS.APP_NAME,"NO METEOR","Graph Editor"]
 if not loadall(screen,dataprovider,clock,footnotes):
     quit(0)
 galaxyls = [i[1] for i in dataprovider.resource("galaxy").items()]
+namespace = UseCase.Entity.Namespace("Graph Editor")
+note = UseCase.Note()
+note.set_note(namespace,"tip0","ESC: Save and Exit")
 controller = Controller(UseCase.Entity.Pos(*pygame.mouse.get_pos(),*screensize),galaxyls,screensize)
 handler = InjectedHandler(controller,dataprovider.dic["星座/galaxy.json"],dataprovider.resource("galaxy"),screensize)
 sr = StarRenderer(screen,screensize)
 gr = InjectedGalaxyRenderer(screen,screensize,controller,dataprovider.resource("namefont"),dataprovider.resource("labelfont") if dataprovider.resource("labelfont") else dataprovider.resource("namefont"),sr)
 cr = ControllerRenderer(screen,screensize)
+nr = SideCMD(screen,screensize,pygame.font.SysFont(NOTE.DEFAULT_FONT,NOTE.DEFAULT_FONT_SIZE),[""])
 keepgoing = True
 while keepgoing:
     try:
@@ -283,6 +339,7 @@ while keepgoing:
         elif handler.state == 1 or handler.state == 2:
             gr.render(dataprovider.resource("galaxy")[galaxyname].get(),noalpha=galaxyname==handler.galaxyname)
     cr.render(controller)
+    nr.render(note)
     pygame.display.update()
     clock.tick(CONSTANTS.TICK_SPEED)
 pygame.quit()

@@ -9,6 +9,7 @@ from usecase.meteor import Meteor as _Meteor
 from usecase.picture import Picture as _Picture
 from usecase.renderer import Renderer as _Renderer
 from usecase.star import Star as _Star
+from usecase.note import Note as _Note
 from entity.entity import Entity as _Entity
 class UseCase(Layer):
     var = _var
@@ -23,3 +24,4 @@ class UseCase(Layer):
     Star = _Star
     Entity = _Entity
     StopPlaying = _StopPlaying
+    Note = _Note

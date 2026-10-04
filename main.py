@@ -16,6 +16,7 @@ aset.GALAXY = GALAXY
 aset.GENERAL = GENERAL
 # aset.HANDLER = HANDLER
 aset.STAR = STAR
+aset.NOTE = NOTE
 
 from init import loadall
 from adapter.pygame.data_provider_pickle import Pickle

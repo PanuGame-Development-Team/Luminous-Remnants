@@ -6,7 +6,8 @@ from entity.star import Star as _Star
 from entity.lib import Pos as _Pos,\
         Resource_id as _Resource_id,\
     ResourceManager as _ResourceManager,\
-            average as _average
+            average as _average,\
+            Namespace as _Namespace
 class Entity(Layer):
     Galaxy = _Galaxy
     Meteor = _Meteor
@@ -16,3 +17,4 @@ class Entity(Layer):
     Resource_id = _Resource_id
     ResourceManager = _ResourceManager
     average = _average
+    Namespace = _Namespace
