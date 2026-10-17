@@ -4,12 +4,13 @@ from adapter.pygame.renderer.uimath import *
 import os
 import pygame
 class SideCMD(UseCase.Renderer):
-    cache = {}          # Key: name,bold,italic
+    cache:dict          # Key: name,bold,italic
     def __init__(self,display:pygame.surface.Surface,scrsize,font:pygame.font.Font,order=NOTE.ORDER):
         self.display = display
         self.scrsize = scrsize
         self.font = font
         self.order = order
+        self.cache = {}
     def render(self,object:UseCase.Note):
         if not NOTE.ENABLE:
             return

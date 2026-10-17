@@ -65,11 +65,12 @@ def average(*args) -> Pos:
 class Namespace:
     priority = None
     name = None
-    data = {}
     def __init__(self,name:str,priority:int = 100):
         self.name = name
         self.priority = priority
-    d = data.get
+        self.data = {}
+    def d(self,*args):
+        return self.data.get(*args)
     def dc(self,key,gen=None):
         if not key in self.data:
             self.data[key] = gen()
