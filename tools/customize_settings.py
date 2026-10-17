@@ -52,7 +52,10 @@ RANGE = {"INIT.FOOTNOTE_FONT_SIZE":[12,48],
          "METEOR.RAIN.SPACING_TICK":[60,1200],
          "METEOR.RAIN.METEOR_LIMIT":[1,100000],
          "METEOR.RAIN.DURATION":[300,100000],
-         "METEOR.RAIN.TICK_PER_MET":[1,36]
+         "METEOR.RAIN.TICK_PER_MET":[1,36],
+
+         "NOTE.CACHE_KEY_SIZE":[1,65536],
+         "NOTE.DEFAULT_FONT_SIZE":[12,48]
          }
 
 class MainWindow(*QtUiTools.loadUiType("customize_settings.ui")):

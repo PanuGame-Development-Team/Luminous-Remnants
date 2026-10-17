@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Luminous-Remnants Graph-Editor</string>
+   <string>Customize Settings</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -63,6 +63,11 @@
       <widget class="QWidget" name="meteor">
        <attribute name="title">
         <string>METEOR</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="note">
+       <attribute name="title">
+        <string>NOTE</string>
        </attribute>
       </widget>
      </widget>

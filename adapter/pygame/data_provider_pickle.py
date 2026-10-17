@@ -12,27 +12,27 @@ def savdat(name,dat,hashfunc=md5):
     with open(filename,"wb") as file:
         file.write(dat)
     return filename
-def cont2img(index:str,dic:dict) -> pygame.surface.Surface:
+def cont2img(index:str,dic:dict) -> tuple[str,pygame.surface.Surface]:
     filename = savdat(index,dic[index])
-    return pygame.image.load(filename).convert_alpha()
+    return filename,pygame.image.load(filename).convert_alpha()
 class Pickle(UseCase.DataProvider):
+    res = {}
+    startot = 0
+    path = {}
     def __init__(self,screensize,filename="main.lrg"):
         super().__init__()
         self.screensize = screensize
         self.filename = filename
         if not isdir("temp"):
             mkdir("temp")
-    res = {}
-    startot = 0
-    path = {}
     def load_logo(self):
         if not isfile("logo.dat"):
             raise FileNotFoundError("logo.dat")
         with open("logo.dat","rb") as file:
             dic = load(file)
         self.rman = UseCase.Entity.ResourceManager()
-        logo = self.rman.register(cont2img("logo.png",dic))
-        logo2 = self.rman.register(cont2img("logo2.png",dic))
+        logo = self.rman.register(cont2img("logo.png",dic)[1])
+        logo2 = self.rman.register(cont2img("logo2.png",dic)[1])
         return logo,logo2
     def load_data(self):
         if not isfile(self.filename):
@@ -61,8 +61,9 @@ class Pickle(UseCase.DataProvider):
             for stardat in formatted:
                 if stardat[1]:
                     starcnt += 1
-                    if f"星座/{galaxyname}/{starcnt}.jpg" in dic:
-                        img = cont2img(f"星座/{galaxyname}/{starcnt}.jpg",dic)
+                    path = f"星座/{galaxyname}/{starcnt}.jpg"
+                    if path in dic:
+                        self.path[path],img = cont2img(path,dic)
                         pic = UseCase.Picture(self.datrman.register(pygame.transform.smoothscale_by(img,min(self.screensize[0] / img.get_width(),self.screensize[1] / img.get_height())).convert()))
                         stars.append(UseCase.Star(random()*360,choice([STAR.ROTATION,-STAR.ROTATION]),stardat[0],False,pic))
                     else:
@@ -85,8 +86,9 @@ class Pickle(UseCase.DataProvider):
             for stardat in formatted:
                 if stardat[1]:
                     starcnt += 1
-                    if f"星座/{galaxyname}/{starcnt}.jpg" in dic:
-                        img = cont2img(f"星座/{galaxyname}/{starcnt}.jpg",dic)
+                    path = f"星座/{galaxyname}/{starcnt}.jpg"
+                    if path in dic:
+                        self.path[path],img = cont2img(path,dic)
                         pic = UseCase.Picture(self.datrman.register(pygame.transform.smoothscale_by(img,min(self.screensize[0] / img.get_width(),self.screensize[1] / img.get_height())).convert()))
                         stars.append(UseCase.Star(random()*360,choice([STAR.ROTATION,-STAR.ROTATION]),stardat[0],False,pic))
                     else:

@@ -5,6 +5,7 @@ from settings import *
 
 METEOR.ENABLE = False
 GENERAL.VISIBLE_DISTANCE = 1e9
+CONSTANTS.APP_NAME = "Graph Editor"
 
 eset.DEBUG = DEBUG
 eset.STAR = STAR
@@ -24,6 +25,7 @@ aset.NOTE = NOTE
 
 from init import loadall
 from json import dumps
+from sys import argv
 from adapter.pygame.data_provider_pickle import Pickle,load,cont2img
 from adapter.pygame.renderer.renderer_controller import ControllerRenderer
 from adapter.pygame.renderer.renderer_star import StarRenderer
@@ -276,8 +278,8 @@ class NoneProvider(UseCase.DataProvider):
         with open("logo.dat","rb") as file:
             dic = load(file)
         self.rman = UseCase.Entity.ResourceManager()
-        logo = self.rman.register(cont2img("logo.png",dic))
-        logo2 = self.rman.register(cont2img("logo2.png",dic))
+        logo = self.rman.register(cont2img("logo.png",dic)[1])
+        logo2 = self.rman.register(cont2img("logo2.png",dic)[1])
         return logo,logo2
     def load_data(self):
         self.path["namefont"] = ""
@@ -300,7 +302,10 @@ if isfile("main.lrg"):
     dataprovider = Pickle(screensize,"main.lrg")
 else:
     dataprovider = NoneProvider()
-footnotes = [CONSTANTS.VERSION,CONSTANTS.APP_NAME,"NO METEOR","Graph Editor"]
+initns = UseCase.Entity.Namespace(CONSTANTS.APP_NAME)
+footnotes = UseCase.Note()
+footnotes.set_note(initns,"meteor","NO METEOR")
+footnotes.set_note(initns,"version",CONSTANTS.VERSION)
 if not loadall(screen,dataprovider,clock,footnotes):
     quit(0)
 galaxyls = [i[1] for i in dataprovider.resource("galaxy").items()]
@@ -343,5 +348,219 @@ while keepgoing:
     pygame.display.update()
     clock.tick(CONSTANTS.TICK_SPEED)
 pygame.quit()
-with open("test.json","w") as file:
-    file.write(dumps(handler.galaxydict,ensure_ascii=False))
+pygame.init()
+json:dict = handler.galaxydict
+labels:dict = {x:dataprovider.dic.get(f"星座/{x}/label.txt","") for x in json}
+from PySide6.QtWidgets import *
+from PySide6.QtGui import QPixmap
+from PySide6.QtCore import QDir
+from PySide6.QtUiTools import loadUiType
+import os,pickle
+class FileViewDialog(QDialog):
+    filetype = "文件"
+    filefilter = "所有文件(*.*)"
+    def __init__(self,parent=None,filename="",target=None):
+        super().__init__(parent)
+        self.setWindowTitle("编辑" + self.filetype)
+        self.target = target
+        self.filename = filename
+        layout = QVBoxLayout(self)
+        self.view = self.genview()
+        layout.addWidget(self.view)
+        buttonwidget = QWidget()
+        bwlayout = QHBoxLayout(buttonwidget)
+        btn = QPushButton("选择")
+        btn.clicked.connect(self.select)
+        bwlayout.addWidget(btn)
+        btn = QPushButton("保存")
+        btn.clicked.connect(self.save)
+        bwlayout.addWidget(btn)
+        btn = QPushButton("取消")
+        btn.clicked.connect(self.close)
+        bwlayout.addWidget(btn)
+        layout.addWidget(buttonwidget)
+        if filename:
+            self.load(filename)
+    def load(self,filename:str):...
+    def genview(self) -> QWidget:...
+    def save(self):...
+    def select(self):
+        filename = QFileDialog.getOpenFileName(self,"选择" + self.filetype,QDir.currentPath(),self.filefilter)
+        if filename[0]:
+            self.load(filename[0])
+class SelectImageDialog(FileViewDialog):
+    filetype = "图片"
+    filefilter = "Pygame可识别图片(*.png *jpg *.jpeg)"
+    def load(self,filename:str):
+        try:
+            pixmap = QPixmap()
+            pixmap.load(filename)
+            pygame.image.load(filename)
+        except:
+            QMessageBox.critical(self,"错误","不是一个图片文件，请修改路径。")
+            return
+        self.view.setPixmap(pixmap.scaledToHeight(512))
+        self.filename = filename
+    def genview(self) -> QLabel:
+        return QLabel()
+    def save(self):
+        self.target:QTreeWidgetItem
+        self.target.setText(1,self.filename)
+        self.close()
+class SelectBGMDialog(FileViewDialog):
+    filetype = "OGG音乐"
+    filefilter = "OGG音频文件(*.ogg)"
+    def load(self,filename:str):
+        try:
+            pygame.mixer.Sound(filename).get_length()
+        except:
+            QMessageBox.critical(self,"错误","不是一个OGG文件，请修改路径。")
+            return
+        if not self.view.text():
+            self.view.clicked.connect(self.handleopen)
+        self.view.setText("打开本地播放器（如果来源未知，Windows用户有潜在危险）：" + filename)
+        self.filename = filename
+    def genview(self) -> QPushButton:
+        return QPushButton()
+    def handleopen(self):
+        os.system(("" if os.name == "nt" else "xdg-open ") + self.filename)
+    def save(self):
+        self.target:QListWidgetItem
+        self.target.setText(self.filename)
+        self.close()
+class GalaxyDialog(QDialog):
+    def __init__(self,parent=None,galaxyname="",label="",item:QTreeWidgetItem=None):
+        super().__init__(parent)
+        self.item = item
+        self.galaxyname = galaxyname
+        layout = QFormLayout(self)
+        self.glninput = QLineEdit(galaxyname)
+        self.labinput = QLineEdit(label)
+        layout.addRow("星座名称",self.glninput)
+        layout.addRow("星座标签",self.labinput)
+    def closeEvent(self,event):
+        gln = self.glninput.text()
+        lab = self.labinput.text()
+        self.item.setText(0,gln)
+        self.item.setText(1,lab)
+        if gln != self.galaxyname:
+            json[gln] = json.pop(self.galaxyname)
+            labels.pop(self.galaxyname)
+        labels[gln] = lab
+        return super().closeEvent(event)
+class EditorWindow(*loadUiType("graph_editor.ui")):
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.tree_graph:QTreeWidget
+        self.list_bgm:QListWidget
+        self.font_path:QLineEdit
+        self.btn_font:QPushButton
+        self.widget:QWidget
+        self.btn_pack:QPushButton
+        for galaxyname in json:
+            toplevelitem = QTreeWidgetItem([galaxyname,dataprovider.dic.get(f"星座/{galaxyname}/label.txt","")])
+            starcnt = 0
+            for i in range(len(json[galaxyname]) - 1):
+                if json[galaxyname][i]["star"]:
+                    starcnt += 1
+                    path = f"星座/{galaxyname}/{starcnt}.jpg"
+                    item = QTreeWidgetItem([f"POS {i}",dataprovider.path.get(path,"")])
+                    toplevelitem.addChild(item)
+            self.tree_graph.addTopLevelItem(toplevelitem)
+        self.tree_graph.itemDoubleClicked.connect(self.edit_tree_graph)
+
+        for i in dataprovider.path["bgm"]:
+            self.list_bgm.addItem(QListWidgetItem(i))
+        self.list_bgm.itemDoubleClicked.connect(self.edit_list_bgm)
+
+        self.font_path.setText(dataprovider.path.get("namefont",""))
+        self.btn_font.clicked.connect(self.select_font_file)
+
+        top:QPushButton = self.widget.layout().itemAt(0).widget()
+        add:QPushButton = self.widget.layout().itemAt(1).widget()
+        del_:QPushButton = self.widget.layout().itemAt(2).widget()
+
+        top.clicked.connect(self.top_clicked)
+        add.clicked.connect(self.add_clicked)
+        del_.clicked.connect(self.del_clicked)
+
+        self.btn_pack.clicked.connect(self.pack)
+    def edit_tree_graph(self,item:QTreeWidgetItem,column:int):
+        if item.parent():
+            SelectImageDialog(self,item.text(1),item).exec()
+        else:
+            GalaxyDialog(self,item.text(0),item.text(1),item).exec()
+    def edit_list_bgm(self,item:QListWidgetItem):
+        SelectBGMDialog(self,item.text(),item).exec()
+    def select_font_file(self):
+        filename = QFileDialog.getOpenFileName(self,"选择字体",QDir.currentPath(),"TrueType字体文件(*.ttf)")[0]
+        if not filename:
+            return
+        try:
+            pygame.font.Font(filename,24).render("TEST RENDER",1,[0,0,0])
+        except:
+            QMessageBox.critical(self,"错误","请选择完整正确的TrueType字体文件（.ttf），而非其它文件。")
+            return
+        self.font_path.setText(filename)
+    def top_clicked(self):
+        if self.list_bgm.currentRow() != -1:
+            text = self.list_bgm.currentItem().text()
+            self.list_bgm.takeItem(self.list_bgm.currentRow())
+            self.list_bgm.insertItem(0,QListWidgetItem(text))
+    def add_clicked(self):
+        self.list_bgm.addItem(QListWidgetItem("新文件"))
+        SelectBGMDialog(self,"",self.list_bgm.item(self.list_bgm.count() - 1)).exec()
+        text = self.list_bgm.item(self.list_bgm.count() - 1).text()
+        if not text or text == "新文件":
+            self.list_bgm.takeItem(self.list_bgm.count() - 1)
+    def del_clicked(self):
+        if self.list_bgm.currentRow() != -1:
+            self.list_bgm.takeItem(self.list_bgm.currentRow())
+    def get_filename(self) -> str:
+        if not os.path.isfile("main.lrg"):
+            return "main.lrg"
+        i = 1
+        while os.path.isfile(f"main-{i}.lrg"):
+            i += 1
+        return f"main-{i}.lrg"
+    def validate(self) -> bool:
+        if not self.font_path.text():
+            return False
+        if self.list_bgm.count() == 0:
+            return False
+        return True
+    def pack(self):
+        if not self.validate():
+            QMessageBox.critical(self,"错误","无法保存，有未填充的必填数据段")
+            return
+        try:
+            dic = {}
+            dic["VERSION"] = CONSTANTS.PACKVER
+            dic["font.ttf"] = self.loaddat(self.font_path.text())
+            dic["bg.ogg"] = []
+            for i in range(self.list_bgm.count()):
+                dic["bg.ogg"].append(self.loaddat(self.list_bgm.item(i).text()))
+            dic["星座/galaxy.json"] = json
+            prep = {}
+            for i in range(self.tree_graph.topLevelItemCount()):
+                item = self.tree_graph.topLevelItem(i)
+                prep[item.text(0)] = item
+            for galaxyname in json:
+                for pos_id in range(prep[galaxyname].childCount()):
+                    child = prep[galaxyname].child(pos_id)
+                    if child.text(1):
+                        dic[f"星座/{galaxyname}/{pos_id + 1}.jpg"] = self.loaddat(child.text(1))
+                dic[f"星座/{galaxyname}/label.txt"] = labels[galaxyname]
+            filename = self.get_filename()
+            with open(filename,"wb") as file:
+                pickle.dump(dic,file)
+            QMessageBox.information(self,"成功","已成功打包星图")
+        except Exception as e:
+            QMessageBox.critical(self,"错误","打包时有错误产生:" + str(e))
+    def loaddat(self,filename):
+        return open(filename,"rb").read()
+app = QApplication(argv)
+window = EditorWindow()
+window.show()
+app.exec()

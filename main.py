@@ -37,11 +37,13 @@ clock = pygame.time.Clock()
 screensize = screen.get_size()
 pygame.mouse.set_visible(False)
 dataprovider = Pickle(screensize,"main.lrg")
-footnotes = [CONSTANTS.VERSION,CONSTANTS.APP_NAME]
+initns = UseCase.Entity.Namespace(CONSTANTS.APP_NAME)
+footnotes = UseCase.Note()
 if HANDLER.AUTOPLAY.ENABLE:
-    footnotes.append("AUTOPLAY")
+    footnotes.set_note(initns,"autoplay","AUTOPLAY")
 if not METEOR.ENABLE:
-    footnotes.append("NO METEOR")
+    footnotes.set_note(initns,"meteor","NO METEOR")
+footnotes.set_note(initns,"version",CONSTANTS.VERSION)
 if not loadall(screen,dataprovider,clock,footnotes):
     quit(0)
 galaxyls = [i[1] for i in dataprovider.resource("galaxy").items()]

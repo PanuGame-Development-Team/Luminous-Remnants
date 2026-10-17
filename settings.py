@@ -2,7 +2,7 @@ from os.path import isfile
 from json import loads
 class CONSTANTS:
     APP_NAME = "Luminous-Remnants"
-    VERSION = "2.0.1-260901-beta"
+    VERSION = "2.0.2-261016-RC1"
     PACKVER = "2.0.1"
     TICK_SPEED = 60
     EPSILON = 1e-6
@@ -90,7 +90,7 @@ if isfile("properties"):
             line = i.strip("\n")
             if not line:
                 continue
-            if line in ["[INIT]","[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[PICTURE]","[CONTROLLER]","[HANDLER]","[METEOR]"]:
+            if line in ["[INIT]","[DEBUG]","[GENERAL]","[GALAXY]","[STAR]","[PICTURE]","[CONTROLLER]","[HANDLER]","[METEOR]","[NOTE]"]:
                 section = line.replace("[","").replace("]","")
                 continue
             if not "=" in line:
